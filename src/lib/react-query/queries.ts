@@ -11,7 +11,6 @@ import {
   signInAccount,
   getCurrentUser,
   signOutAccount,
-  getUsers,
   getInfiniteUsers,
   createPost,
   getPostById,
@@ -70,6 +69,7 @@ export const useGetPosts = () => {
       const lastId = lastPage.documents[lastPage.documents.length - 1].$id;
       return lastId;
     },
+    initialPageParam: null, // Add the initialPageParam property with a value of null
   });
 };
 
@@ -230,6 +230,7 @@ export const useGetUsers = () => {
       const lastId = lastPage.documents[lastPage.documents.length - 1].$id;
       return lastId;
     },
+    initialPageParam: null, // Add the initialPageParam property with a value of null
   });
 };
 

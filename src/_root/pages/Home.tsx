@@ -1,4 +1,4 @@
-import { Key, useRef, useEffect, useState } from "react";
+import { useState } from "react";
 
 import { Models } from "appwrite";
 
@@ -8,12 +8,7 @@ import UserStory from "@/components/shared/UserStory";
 
 const Home = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const {
-    data: creators,
-    isLoading: isUserLoading,
-    fetchNextPage,
-    hasNextPage,
-  } = useGetUsers();
+  const { data: creators, isLoading: isUserLoading } = useGetUsers();
   const {
     data: posts,
     isLoading: isPostLoading,
@@ -22,7 +17,7 @@ const Home = () => {
 
   const handleNext = () => {
     setCurrentIndex((prevIndex) =>
-      Math.min(prevIndex + 6, creators.pages[0].documents.length - 6)
+      Math.min(prevIndex + 6, creators?.pages[0]?.documents.length ?? 0 - 6)
     );
   };
 
@@ -53,7 +48,7 @@ const Home = () => {
   return (
     <div className="flex flex-1">
       <div className="home-container">
-        <ul className="flex">
+        <ul className="flex gap-4">
           <img
             src="/assets/icons/arrow-left.svg"
             alt="Arrow Right"
@@ -62,19 +57,17 @@ const Home = () => {
             className="cursor-pointer"
             onClick={() => handlePrevious()}
           />
-          <li className="flex gap-4">
-            {creators.pages.map((users) => (
-              <>
-                {users.documents
-                  .slice(currentIndex, currentIndex + 6)
-                  .map(
-                    (user: Models.Document, index: Key | null | undefined) => (
-                      <UserStory user={user} key={index} />
-                    )
-                  )}
-              </>
-            ))}
-          </li>
+          {creators.pages.map((users) => (
+            <>
+              {users.documents
+                .slice(currentIndex, currentIndex + 6)
+                .map((user: Models.Document) => (
+                  <li key={user.$id}>
+                    <UserStory user={user} />
+                  </li>
+                ))}
+            </>
+          ))}
           <img
             src="/assets/icons/arrow-right.svg"
             alt="Arrow Right"
@@ -114,13 +107,11 @@ const Home = () => {
           <>
             {creators?.pages.map((user) => (
               <ul className="grid 2xl:grid-cols-2 gap-6">
-                {user.documents.map(
-                  (item: Models.Document, index: Key | null | undefined) => (
-                    <li key={index}>
-                      <UserCard user={item} />
-                    </li>
-                  )
-                )}
+                {user.documents.map((item: Models.Document) => (
+                  <li key={item.$id}>
+                    <UserCard user={item} />
+                  </li>
+                ))}
               </ul>
             ))}
           </>
