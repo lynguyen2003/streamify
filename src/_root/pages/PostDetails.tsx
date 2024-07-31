@@ -134,6 +134,7 @@ const PostDetails = () => {
                   </li>
                 ))}
               </ul>
+              <hr className="border w-full border-dark-4/80" />
             </div>
 
             <div className="w-full">

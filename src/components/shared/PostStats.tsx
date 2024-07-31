@@ -120,7 +120,6 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
           className="cursor-pointer"
           onClick={(e) => handleSavePost(e)}
         />
-        <p className="small-medium lg:base-medium my-auto">55</p>
       </div>
     </div>
   );
