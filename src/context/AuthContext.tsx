@@ -37,7 +37,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const [user, setUser] = useState<IUser>(INITIAL_USER);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Set initial loading state to true
 
   const checkAuthUser = async () => {
     setIsLoading(true);
@@ -53,10 +53,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           bio: currentAccount.bio,
         });
         setIsAuthenticated(true);
-
         return true;
       }
-
       return false;
     } catch (error) {
       console.error(error);
@@ -72,10 +70,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       cookieFallback === "[]" ||
       cookieFallback === null ||
       cookieFallback === undefined
-    ) {
-      navigate("/sign-in");
-    }
-
+    ) 
     checkAuthUser();
   }, []);
 
@@ -88,7 +83,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     checkAuthUser,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {!isLoading && children} {/* Render children only when not loading */}
+    </AuthContext.Provider>
+  );
 }
 
 export const useUserContext = () => useContext(AuthContext);

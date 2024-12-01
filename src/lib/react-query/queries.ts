@@ -25,6 +25,8 @@ import {
   searchPosts,
   savePost,
   deleteSavedPost,
+  forgotPassword,
+  resetPassword,
 } from "@/lib/appwrite/api";
 import { INewPost, INewUser, IUpdatePost, IUpdateUser } from "@/types";
 
@@ -42,6 +44,23 @@ export const useSignInAccount = () => {
   return useMutation({
     mutationFn: (user: { email: string; password: string }) =>
       signInAccount(user),
+  });
+};
+
+export const useForgotPassword = () => {
+  return useMutation({
+    mutationFn: ({ email, url }: { email: string; url: string }) =>
+      forgotPassword(email, url),
+  });
+};
+
+export const useResetPassword = () => {
+  return useMutation({
+    mutationFn: (user: {
+      userId: string;
+      secret: string;
+      password: string;
+    }) => resetPassword(user.userId, user.secret, user.password),
   });
 };
 

@@ -119,6 +119,13 @@ const SigninForm = () => {
             >
               Sign up
             </Link>
+            <br />
+            <Link
+              to="/forgot-password"
+              className="text-primary-500 text-small-semibold ml-1"
+            >
+              Forgot Password?
+            </Link>
           </p>
         </form>
       </div>

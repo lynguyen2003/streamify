@@ -21,6 +21,8 @@ import SigninForm from "@/_auth/forms/SigninForm";
 import { Toaster } from "@/components/ui/toaster";
 
 import "./globals.css";
+import ResetPasswordForm from "./_auth/forms/ResetPasswordForm";
+import ForgotPasswordForm from "./_auth/forms/ForgotPasswordForm";
 
 const App = () => {
   return (
@@ -30,6 +32,8 @@ const App = () => {
         <Route element={<AuthLayout />}>
           <Route path="/sign-in" element={<SigninForm />} />
           <Route path="/sign-up" element={<SignupForm />} />
+          <Route path="/reset-password" element={<ResetPasswordForm />} />
+          <Route path="/forgot-password" element={<ForgotPasswordForm />} />
         </Route>
 
         {/* private routes */}

@@ -116,6 +116,36 @@ export async function signOutAccount() {
   }
 }
 
+// ============================== FORGOT PASSWORD
+export async function forgotPassword(email: string, url: string) {
+  try {
+    const response = await account.createRecovery(email, url);
+    return response;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+// ============================== RESET PASSWORD
+export async function resetPassword(
+  userId: string,
+  secret: string,
+  password: string,
+) {
+  try {
+    const response = await account.updateRecovery(
+      userId,
+      secret,
+      password,
+    );
+    return response;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
 // ============================================================
 // POSTS
 // ============================================================

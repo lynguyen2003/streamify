@@ -46,3 +46,19 @@ export const PostValidation = z.object({
     .max(1000, { message: "Maximum 1000 characters." }),
   tags: z.string(),
 });
+
+export const ForgotPasswordValidation = z.object({
+  email: z.string().email(),
+});
+
+export const ResetPasswordValidation = z.object({
+  password: z
+    .string()
+    .min(8, { message: "Password must be at least 8 characters." }),
+  confirmPassword: z
+    .string()
+    .min(8, { message: "Password must be at least 8 characters." }),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
