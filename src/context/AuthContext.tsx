@@ -71,9 +71,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       cookieFallback === "[]" ||
       cookieFallback === null ||
       cookieFallback === undefined
-    ) 
-    if (location.pathname !== "/reset-password") 
-    navigate("/sign-in");
+    ) {
+      if (location.pathname !== "/reset-password") 
+        navigate("/sign-in");
+    }
     checkAuthUser();
   }, []);
 
