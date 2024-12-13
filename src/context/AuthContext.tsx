@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 import { IUser } from "@/types";
 import { getCurrentUser } from "@/lib/appwrite/api";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export const INITIAL_USER = {
   id: "",
@@ -36,6 +37,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<IUser>(INITIAL_USER);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // Set initial loading state to true
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const checkAuthUser = async () => {
     setIsLoading(true);
@@ -69,6 +72,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       cookieFallback === null ||
       cookieFallback === undefined
     ) 
+    if (location.pathname !== "/reset-password") 
+    navigate("/sign-in");
     checkAuthUser();
   }, []);
 

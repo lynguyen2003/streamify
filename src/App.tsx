@@ -32,8 +32,8 @@ const App = () => {
         <Route element={<AuthLayout />}>
           <Route path="/sign-in" element={<SigninForm />} />
           <Route path="/sign-up" element={<SignupForm />} />
-          <Route path="/reset-password" element={<ResetPasswordForm />} />
           <Route path="/forgot-password" element={<ForgotPasswordForm />} />
+          <Route path="/reset-password" element={<ResetPasswordForm />} />
         </Route>
 
         {/* private routes */}

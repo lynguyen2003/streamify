@@ -12,6 +12,7 @@ const GridPostList = ({
   showUser = true,
   showStats = true,
 }: GridPostListProps) => {
+
   return (
     <>
       {posts.map((post) => (
