@@ -153,7 +153,9 @@ const PostDetails = () => {
         {isUserPostLoading || !relatedPosts ? (
           <Loader />
         ) : (
-          <GridPostList posts={relatedPosts} />
+          <ul className="grid-container">
+            <GridPostList posts={relatedPosts} />
+          </ul>
         )}
       </div>
     </div>
