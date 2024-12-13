@@ -8,7 +8,8 @@ import { useGetPosts, useGetUsers } from "@/lib/react-query/queries";
 import UserStory from "@/components/shared/UserStory";
 
 const Home = () => {
-  const { ref, inView } = useInView();
+  const { ref: postRef, inView: inViewPost } = useInView();
+  const { ref: userRef, inView: inViewUser } = useInView();
   const scrollContainerRef = useRef(null);
   const {
     data: creators,
@@ -26,11 +27,13 @@ const Home = () => {
   } = useGetPosts();
 
   useEffect(() => {
-    if (inView) {
-      fetchNextPostPage();
+    if (inViewUser) {
       fetchNextUserPage();
     }
-  }, [inView]);
+    if (inViewPost) {
+      fetchNextPostPage();
+    }
+  }, [inViewUser, inViewPost]);
 
   useEffect(() => {
     updateArrowsVisibility();
@@ -175,7 +178,7 @@ const Home = () => {
             </ul>
           )}
           {hasNextPagePost && (
-            <div ref={ref} className="flex-center w-full">
+            <div ref={postRef} className="flex-center w-full">
               <Loader />
             </div>
           )}
@@ -200,7 +203,7 @@ const Home = () => {
             </ul>
         )}
         {hasNextPageUser && (
-            <div ref={ref} className="flex-center w-full">
+            <div ref={userRef} className="flex-center w-full">
               <Loader />
             </div>
           )}
