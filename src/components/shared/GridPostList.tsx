@@ -13,7 +13,7 @@ const GridPostList = ({
   showStats = true,
 }: GridPostListProps) => {
   return (
-    <ul className="grid-container">
+    <>
       {posts.map((post) => (
         <li key={post.$id} className="relative min-w-80 h-80">
           <Link to={`/posts/${post.$id}`} className="grid-post_link">
@@ -23,7 +23,7 @@ const GridPostList = ({
               className="h-full w-full object-cover"
             />
           </Link>
-
+        
           <div className="grid-post_user">
             {showUser && (
               <div className="flex items-center justify-between gap-2 flex-1">
@@ -57,7 +57,7 @@ const GridPostList = ({
           </div>
         </li>
       ))}
-    </ul>
+    </>
   );
 };
 

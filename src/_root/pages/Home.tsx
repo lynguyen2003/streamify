@@ -1,20 +1,36 @@
 import { useEffect, useRef } from "react";
+import { useInView } from "react-intersection-observer";
 
 import { Models } from "appwrite";
 
 import { Loader, PostCard, UserCard } from "@/components/shared";
-import { useGetRecentPosts, useGetUsers } from "@/lib/react-query/queries";
+import { useGetPosts, useGetUsers } from "@/lib/react-query/queries";
 import UserStory from "@/components/shared/UserStory";
 
 const Home = () => {
+  const { ref, inView } = useInView();
   const scrollContainerRef = useRef(null);
+  const {
+    data: creators,
+    isLoading: isUserLoading,
+    fetchNextPage: fetchNextUserPage,
+    hasNextPage: hasNextPageUser,
+  } = useGetUsers();
 
-  const { data: creators, isLoading: isUserLoading } = useGetUsers();
   const {
     data: posts,
     isLoading: isPostLoading,
     isError: isErrorPosts,
-  } = useGetRecentPosts();
+    fetchNextPage: fetchNextPostPage, 
+    hasNextPage: hasNextPagePost,
+  } = useGetPosts();
+
+  useEffect(() => {
+    if (inView) {
+      fetchNextPostPage();
+      fetchNextUserPage();
+    }
+  }, [inView]);
 
   useEffect(() => {
     updateArrowsVisibility();
@@ -147,12 +163,21 @@ const Home = () => {
             <Loader />
           ) : (
             <ul className="flex flex-col flex-1 gap-9 w-full ">
-              {posts?.documents.map((post: Models.Document) => (
-                <li key={post.$id} className="flex justify-center w-full">
-                  <PostCard post={post} />
-                </li>
-              ))}
+                {posts?.pages.map((posts) => (
+                  <>
+                  {posts.documents.map((post: Models.Document, index: any) => (
+                    <li key={`page-${index}`} className="flex justify-center w-full">
+                      <PostCard post={post} />
+                    </li>
+                  ))}
+                  </>
+                ))}
             </ul>
+          )}
+          {hasNextPagePost && (
+            <div ref={ref} className="flex-center w-full">
+              <Loader />
+            </div>
           )}
         </div>
       </div>
@@ -162,18 +187,23 @@ const Home = () => {
         {isUserLoading && !creators ? (
           <Loader />
         ) : (
-          <>
-            {creators?.pages.map((user) => (
-              <ul className="grid 2xl:grid-cols-2 gap-6">
-                {user.documents.map((item: Models.Document) => (
-                  <li key={item.$id}>
-                    <UserCard user={item} />
-                  </li>
+          <ul className="grid 2xl:grid-cols-2 gap-6">
+                {creators?.pages.map((users) => (
+                  <>
+                  {users.documents.map((item: Models.Document, index: any) => (
+                    <li key={`page-${index}`}>
+                      <UserCard user={item} />
+                    </li>
+                  ))}
+                  </>
                 ))}
-              </ul>
-            ))}
-          </>
+            </ul>
         )}
+        {hasNextPageUser && (
+            <div ref={ref} className="flex-center w-full">
+              <Loader />
+            </div>
+          )}
       </div>
     </div>
   );

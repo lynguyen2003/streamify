@@ -62,7 +62,7 @@ const Explore = () => {
             src="/assets/icons/search.svg"
             width={24}
             height={24}
-            alt="search"
+            alt="search" 
           />
           <Input
             type="text"
@@ -100,16 +100,20 @@ const Explore = () => {
         ) : shouldShowPosts ? (
           <p className="text-light-4 mt-10 text-center w-full">End of posts</p>
         ) : (
-          posts.pages.map((item, index) => (
-            <GridPostList key={`page-${index}`} posts={item.documents} />
-          ))
+          <>
+            <ul className="grid-container">
+              {posts.pages.map((item, index) => (
+                <GridPostList key={`page-${index}`} posts={item.documents} />
+              ))}
+            </ul>
+          </>
+        )}
+        {hasNextPage && !searchValue && (
+          <div ref={ref} className="flex-center w-full">
+            <Loader />
+          </div>
         )}
       </div>
-      {hasNextPage && !searchValue && (
-        <div ref={ref} className="mt-10">
-          <Loader />
-        </div>
-      )}
     </div>
   );
 };

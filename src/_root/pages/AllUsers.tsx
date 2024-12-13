@@ -9,7 +9,7 @@ const AllUsers = () => {
   const { ref, inView } = useInView();
   const {
     data: creators,
-    isLoading,
+    isLoading: isUsersLoading,
     fetchNextPage,
     hasNextPage,
   } = useGetUsers();
@@ -20,43 +20,35 @@ const AllUsers = () => {
     }
   }, [inView]);
 
-  if (!creators) {
-    return <Loader />;
-  }
-
   return (
     <div className="common-container">
       <div className="user-container">
         <h2 className="h3-bold md:h2-bold text-left w-full">All Users</h2>
-        {isLoading && !creators ? (
-          <Loader />
-        ) : (
-          <>
-            {creators?.pages.map((users) => {
-              return (
-                <>
-                  <ul className="user-grid">
-                    {users.documents.map(
+        {isUsersLoading && !creators ? (
+            <Loader />
+          ) : (
+            <ul className="user-grid">
+                {creators?.pages.map((users) => (
+                  <>
+                  {users.documents.map(
                       (user: Models.Document, index: any) => (
                         <li
                           key={`page-${index}`}
-                          className="flex-1 min-w-[200px] w-full  "
+                          className="flex-1 min-w-[200px] w-full"
                         >
                           <UserCard user={user} />
                         </li>
                       )
                     )}
-                  </ul>
-                  {hasNextPage && (
-                    <div ref={ref} className="flex-center w-full">
-                      <Loader />
-                    </div>
-                  )}
-                </>
-              );
-            })}
-          </>
-        )}
+                  </>
+                ))}   
+            </ul>
+          )}
+          {hasNextPage && (
+            <div ref={ref} className="flex-center w-full">
+              <Loader />
+            </div>
+          )}
       </div>
     </div>
   );
