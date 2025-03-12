@@ -38,6 +38,8 @@ export type IUser = {
   email: string;
   imageUrl: string;
   bio: string;
+  isAuthenticated: boolean;
+  isLoading: boolean;
 };
 
 export type INewUser = {
