@@ -1,51 +1,80 @@
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Provider, useSelector } from 'react-redux';
+import { RootState, store } from './store';
+import { Fragment, ElementType } from 'react';
+import "./globals.css";
 
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Provider } from 'react-redux';
-import { PersistGate } from 'redux-persist/integration/react';
-import { store, persistor } from './store';
-import ProtectedRoute  from './routes/ProtectedRoute';
-import PublicRoute from './routes/PublicRoute';
-import Home from './pages/Home';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Profile from './pages/Profile';
+import { publicRoutes, privateRoutes } from './routes/routes';
+import NotFound from './pages/Error';
+
+// Add PrivateRoute component
+const PrivateRoute = ({ element, path }: { element: JSX.Element, path: string}) => {
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+
+  return element;
+};
 
 function App() {
-
   return (
     <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
         <Router>
           <Routes>
-            <Route path="/" element={<Home />} />
-            <Route 
-              path="/login" 
-              element={
-                <PublicRoute>
-                  <Login />
-                </PublicRoute>
-              } 
-            />
-            <Route 
-              path="/register" 
-              element={
-                <PublicRoute>
-                  <Register />
-                </PublicRoute>
-              } 
-            />
-            <Route 
-              path="/profile" 
-              element={
-                <ProtectedRoute>
-                  <Profile />
-                </ProtectedRoute>
-              } 
-            />
-            {/* Thêm các routes khác */}
+          {publicRoutes.map((route, index) => {
+                    const Page = route.component;
+                    let Layout: ElementType = Fragment;
+
+                    if (route.layout) {
+                        Layout = route.layout;
+                    } else if (route.layout === null) {
+                        Layout = Fragment;
+                    }
+
+                    return (
+                        <Route
+                            key={index}
+                            path={route.path}
+                            element={
+                                <Layout>
+                                    <Page />
+                                </Layout>
+                            }
+                        />
+                    );
+                })}
+                {privateRoutes.map((route, index) => {
+                    const Page = route.component;
+                    let Layout: ElementType = Fragment;
+
+                    if (route.layout) {
+                        Layout = route.layout;
+                    } else if (route.layout === null) {
+                        Layout = Fragment;
+                    }
+                    return (
+                        <Route
+                            key={index}
+                            path={route.path}
+                            element={
+                                <PrivateRoute
+                                    element={
+                                        <Layout>
+                                            <Page />
+                                        </Layout>
+                                    }
+                                    path={route.path}
+                                />
+                            }
+                        />
+                    );
+                })}
+                
+                <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>
-      </PersistGate>
     </Provider>
   );
 }
