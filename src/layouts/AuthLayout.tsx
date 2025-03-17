@@ -1,13 +1,14 @@
 import { Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
+import { Toaster } from "sonner";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { token } = useSelector((state: RootState) => state.auth);
 
   return (
     <>
-      {isAuthenticated ? (
+      {token ? (
         <Navigate to="/" />
       ) : (
         <div className="flex flex-1 h-full">
@@ -20,8 +21,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <section className="flex flex-1 justify-center items-center flex-col py-10">
             {children}
           </section>
-
-            
+          <Toaster richColors />            
         </div>
       )}
     </>

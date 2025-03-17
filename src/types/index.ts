@@ -32,14 +32,19 @@ export type IUpdatePost = {
 };
 
 export type IUser = {
-  id: string;
-  name: string;
-  username: string;
+  _id: string;
   email: string;
+  username: string;
+  phone: string;
   imageUrl: string;
+  isAdmin: boolean;
+  isActive: boolean;
+  registrationDate: string;
+  lastLogin: string;
   bio: string;
-  isAuthenticated: boolean;
-  isLoading: boolean;
+  followersCount: number;
+  followingCount: number;
+  friendsCount: number;
 };
 
 export type INewUser = {

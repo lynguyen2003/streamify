@@ -6,8 +6,10 @@ import "./globals.css";
 
 import { publicRoutes, privateRoutes } from './routes/routes';
 import NotFound from './pages/Error';
+import { AuthProvider } from './context/AuthContext';
+import { ApolloProvider } from '@apollo/client';
+import { apolloClient } from './lib/api/apiSlice';      
 
-// Add PrivateRoute component
 const PrivateRoute = ({ element, path }: { element: JSX.Element, path: string}) => {
   const { token } = useSelector((state: RootState) => state.auth);
 
@@ -21,60 +23,44 @@ const PrivateRoute = ({ element, path }: { element: JSX.Element, path: string}) 
 function App() {
   return (
     <Provider store={store}>
+      <ApolloProvider client={apolloClient}>
         <Router>
-          <Routes>
-          {publicRoutes.map((route, index) => {
-                    const Page = route.component;
-                    let Layout: ElementType = Fragment;
+          <AuthProvider>
+            <Routes>
+              {publicRoutes.map((route, index) => {
+                const Page = route.component;
+                let Layout: ElementType = Fragment;
 
                     if (route.layout) {
                         Layout = route.layout;
                     } else if (route.layout === null) {
-                        Layout = Fragment;
-                    }
-
-                    return (
-                        <Route
-                            key={index}
-                            path={route.path}
-                            element={
-                                <Layout>
-                                    <Page />
-                                </Layout>
-                            }
-                        />
-                    );
-                })}
-                {privateRoutes.map((route, index) => {
-                    const Page = route.component;
-                    let Layout: ElementType = Fragment;
-
-                    if (route.layout) {
-                        Layout = route.layout;
-                    } else if (route.layout === null) {
-                        Layout = Fragment;
-                    }
-                    return (
-                        <Route
-                            key={index}
-                            path={route.path}
-                            element={
-                                <PrivateRoute
-                                    element={
-                                        <Layout>
-                                            <Page />
-                                        </Layout>
-                                    }
-                                    path={route.path}
-                                />
-                            }
-                        />
-                    );
-                })}
-                
-                <Route path="*" element={<NotFound />} />
-          </Routes>
+                    Layout = Fragment;
+                }
+                return <Route key={index} path={route.path} element={<Layout><Page /></Layout>} />;
+              })}
+              
+              {privateRoutes.map((route, index) => {
+                const Page = route.component;
+                let Layout: ElementType = Fragment;
+                if (route.layout) {
+                    Layout = route.layout;
+                } else if (route.layout === null) {
+                    Layout = Fragment;
+                }
+                return (
+                  <Route 
+                    key={index} 
+                    path={route.path} 
+                    element={<PrivateRoute element={<Layout><Page /></Layout>} path={route.path} />} 
+                  />
+                );
+              })}
+              
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </AuthProvider>
         </Router>
+      </ApolloProvider>
     </Provider>
   );
 }

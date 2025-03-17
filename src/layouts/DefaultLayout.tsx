@@ -1,6 +1,7 @@
 import Topbar from "@/components/shared/Topbar";
 import Bottombar from "@/components/shared/Bottombar";
 import LeftSidebar from "@/components/shared/LeftSidebar";
+import { Toaster } from "sonner";
 
 const DefaultLayout = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -11,6 +12,7 @@ const DefaultLayout = ({ children }: { children: React.ReactNode }) => {
       <section className="flex flex-1 h-full">
         {children}
       </section>
+      <Toaster />
 
       <Bottombar />
     </div>

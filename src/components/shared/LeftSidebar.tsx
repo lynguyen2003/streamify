@@ -4,14 +4,16 @@ import { INavLink } from "@/types";
 import { sidebarLinks } from "@/constants";
 import { Button } from "@/components/ui/button";
 import { logoutUser } from "@/features/auth/authSlice";
-import { useToast } from "../ui/use-toast";
+import { toast } from "sonner"
 import { useAppDispatch } from "@/hooks/useAppDispatch";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 const LeftSidebar = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { pathname } = useLocation();
-  const { toast } = useToast();
+  const { user } = useSelector((state: RootState) => state.auth);
   
   const handleSignOut = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -19,9 +21,10 @@ const LeftSidebar = () => {
     e.preventDefault();
     try {
       await dispatch(logoutUser());
-      navigate("/login");
+      navigate("/sign-in");
+      toast("See you next time!");
     } catch (error) {
-      toast({ title: "Logout failed" });
+      toast.error("Logout failed");
     }
   };
 
@@ -37,15 +40,15 @@ const LeftSidebar = () => {
           />
         </Link>
 
-        <Link to={`/profile/123`} className="flex gap-3 items-center">
+        <Link to={`/profile/${user?._id}`} className="flex gap-3 items-center">
             <img
-              src={"/assets/icons/profile-placeholder.svg"}
+              src={user?.imageUrl || "/assets/icons/profile-placeholder.svg"}
               alt="profile"
               className="h-14 w-14 rounded-full"
             />
             <div className="flex flex-col">
-              <p className="body-bold">John Doe</p>
-              <p className="base-regular text-light-3">@123</p>
+              <p className="body-bold">{user?.username}</p>
+              <p className="base-regular text-light-3">{user?.email}</p>
             </div>
           </Link>
 

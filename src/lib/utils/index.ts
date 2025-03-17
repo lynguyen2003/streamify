@@ -1,3 +1,4 @@
+import { ApolloError } from "@apollo/client";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -55,4 +56,27 @@ export const multiFormatDateString = (timestamp: string = ""): string => {
 
 export const checkIsLiked = (likeList: string[], userId: string) => {
   return likeList.includes(userId);
+};
+
+export const apolloErrorHandler = (error: ApolloError) => {
+  const mainError = error.message;
+  
+  if (error.graphQLErrors && error.graphQLErrors.length > 0) {
+    const graphQLError = error.graphQLErrors[0];
+    
+    if (graphQLError.extensions?.code === 'BAD_USER_INPUT') {
+      return graphQLError.message;
+    }
+    
+    if (graphQLError.extensions?.code === 'UNAUTHENTICATED') {
+      return "Authentication failed";
+    }
+    
+    return graphQLError.message;
+  }
+  
+  if (error.networkError) {
+    return "Network error. Please check your connection";
+  }
+  return mainError;
 };

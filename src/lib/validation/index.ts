@@ -12,6 +12,7 @@ export const SignupValidation = z.object({
   password: z
     .string()
     .min(8, { message: "Password must be at least 8 characters." }),
+  otp: z.string().length(6, { message: "OTP must be 6 digits." }),
 });
 
 export const LoginFormValidation = z.object({

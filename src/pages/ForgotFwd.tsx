@@ -2,15 +2,14 @@ import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "react-router-dom";
-import { useToast } from "@/components/ui/use-toast";
 import { ForgotPasswordValidation } from "@/lib/validation";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Loader from "@/components/shared/Loader";
+import { toast } from "sonner";
 
 const ForgotFwd = () => {
-  const { toast } = useToast();
   const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof ForgotPasswordValidation>>({
@@ -22,14 +21,12 @@ const ForgotFwd = () => {
 
   const handleForgotPassword = async (data: z.infer<typeof ForgotPasswordValidation>) => {
     try {
-      toast({
-        title: "Password Reset Email Sent",
+      toast.success("Password Reset Email Sent", {
         description: "Please check your email for further instructions.",
       });
       navigate("/sign-in");
     } catch (error) {
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: "Failed to send password reset email. Please try again.",
       });
     }

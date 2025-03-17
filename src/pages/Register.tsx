@@ -2,42 +2,67 @@ import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Loader from "@/components/shared/Loader";
-import { useToast } from "@/components/ui/use-toast";
-
 import { SignupValidation } from "@/lib/validation";
+import { toast } from "sonner";
+import { useAuthContext } from "@/context/AuthContext";
 
 const Register = () => {
-  const { toast } = useToast();
   const navigate = useNavigate();
+  const { register, activateUser, isLoading, error } = useAuthContext();
+  const [otp, setOtp] = useState("");
 
   const form = useForm<z.infer<typeof SignupValidation>>({
     resolver: zodResolver(SignupValidation),
     defaultValues: {
-      name: "",
-      username: "",
       email: "",
       password: "",
+      otp: "",
     },
+    mode: "onChange", 
   });
 
-  const handleSignup = async (user: z.infer<typeof SignupValidation>) => {
-    try {
-      console.log(user);
-      navigate("/");
-    } catch (error) {
-      console.log({ error });
+  const isEmailPasswordValid = () => {
+    const email = form.getValues("email");
+    const password = form.getValues("password");
+    return email && password;
+  };
+
+  const handleSendCode = async (user: z.infer<typeof SignupValidation>) => {
+    await register(user);
+    if (error) {
+      toast.error("Failed to send code", {
+        description: error,
+      });
+    } else {
+      toast.success("Verification code sent", {
+        description: `We've sent a 6-digit code to ${user.email}. Please check your inbox.`,
+      });
+    }
+  };
+
+  const handleContinue = async (user: z.infer<typeof SignupValidation>) => {
+    await activateUser(user.email, otp);
+    if (error) {
+      toast.error("Failed to activate user", {
+        description: error,
+      });
+    } else {
+      toast.success("Registration successful", {
+        description: "Your account has been created and verified successfully",
+      });
+      navigate("/sign-in");
     }
   };
 
@@ -92,7 +117,6 @@ const Register = () => {
         </p>
 
         <form
-          onSubmit={form.handleSubmit(handleSignup)}
           className="flex flex-col gap-5 w-full mt-4"
         >
           <FormField
@@ -136,14 +160,34 @@ const Register = () => {
               type="text" 
               className="shad-input" 
               placeholder="Enter 6-digit code"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              disabled={!isEmailPasswordValid()}
+              maxLength={6}
             />
-            <Button type="button" className="shad-button_primary h-12">
-              Send code
+            <Button 
+              type="button" 
+              className="shad-button_primary h-12"
+              onClick={() => handleSendCode(form.getValues())}
+              disabled={!isEmailPasswordValid()}
+            >
+              {isLoading ? <Loader /> : "Send code"}
             </Button>
           </div>
 
-          <Button type="submit" className="shad-button_primary">
-            Continue
+          <Button 
+            type="button" 
+            className="shad-button_primary"
+            onClick={() => handleContinue(form.getValues())}
+            disabled={!isEmailPasswordValid()}
+          >
+            {isLoading ? (
+              <div className="flex-center gap-2">
+                <Loader /> Loading...
+              </div>
+            ) : (
+              "Continue"
+            )}
           </Button>
 
           <p className="text-light-3 text-sm text-center">

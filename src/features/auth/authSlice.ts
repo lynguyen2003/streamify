@@ -1,16 +1,17 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { gql } from '@apollo/client';
 import { apolloClient } from '@/lib/api/apiSlice';
+import { IUser } from '@/types';
 
 type AuthState = {
-  user: string | null;
+  user: IUser | null;
   token: string | null;
   isLoading: boolean;
   error: string | null;
 };
 
 const initialState: AuthState = {
-  user: '',
+  user: null,
   token: localStorage.getItem('token'),
   isLoading: false,
   error: null,
@@ -29,8 +30,32 @@ const LOGIN_MUTATION = gql`
 const REGISTER_MUTATION = gql`
   mutation Register($email: String!, $password: String!) {
     registerUser(email: $email, password: $password) {
-      accessToken
-      refreshToken
+      token
+    }
+  }
+`;
+
+const VERIFY_OTP = gql`
+  mutation VerifyOTP($email: String!, $token: String!) {
+    verifyOTP(email: $email, token: $token) {
+      token
+    }
+  }
+`;
+
+// GraphQL Query
+const GET_USER_BY_ID = gql`
+  query User($userId: String!) {
+    user(id: $userId) {
+        _id
+        email
+        bio
+        username
+        phone
+        imageUrl
+        isActive
+        registrationDate
+        lastLogin
     }
 }
 `;
@@ -66,13 +91,27 @@ export const registerUser = createAsyncThunk(
         variables: userData,
       });
       
-      const { accessToken, refreshToken } = data.registerUser;
-      localStorage.setItem('token', accessToken);
-      localStorage.setItem('refreshToken', refreshToken);
+      const { token } = data.registerUser;
       
-      return { token: accessToken };
+      return { token };
     } catch (error) {
-      console.error('Register error:', error);
+      console.error(error);
+      throw error;
+    }
+  }
+);
+
+export const verifyOTP = createAsyncThunk(
+  'auth/verifyOTP',
+  async (input: { email: string; token: string }) => {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: VERIFY_OTP,
+        variables: input,
+      });
+      return data.verifyOTP;
+    } catch (error) {
+      console.error(error);
       throw error;
     }
   }
@@ -84,6 +123,14 @@ export const logoutUser = createAsyncThunk(
     localStorage.removeItem('token');
     localStorage.removeItem('refreshToken');
     return true;
+  }
+);
+
+export const getUserById = createAsyncThunk(
+  'auth/getUserById',
+  async (userId: string) => {
+    const { data } = await apolloClient.query({ query: GET_USER_BY_ID, variables: { userId } });
+    return data.user;
   }
 );
 
@@ -118,9 +165,8 @@ const authSlice = createSlice({
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(registerUser.fulfilled, (state, action) => {
+      .addCase(registerUser.fulfilled, (state) => {
         state.isLoading = false;
-        state.token = action.payload.token;
         state.error = null;
       })
       .addCase(registerUser.rejected, (state, action) => {
@@ -134,6 +180,22 @@ const authSlice = createSlice({
         state.user = null;
         state.token = null;
         state.error = null;
+      });
+
+    // Get User By Id
+    builder
+      .addCase(getUserById.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(getUserById.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload;
+        state.error = null;
+      })
+      .addCase(getUserById.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || 'Get user by id failed';
       });
   },
 });
