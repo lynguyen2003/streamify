@@ -6,6 +6,7 @@ import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import DefaultLayout from "@/layouts/DefaultLayout";
 import AuthLayout from "@/layouts/AuthLayout";
+import ForgotFwd from "@/pages/ForgotFwd";
 
 interface RouteType {
     path: string;
@@ -17,8 +18,9 @@ interface PrivateRouteType extends RouteType {
 }
 
 export const publicRoutes: RouteType[] = [
-    { path: '/login', component: Login, layout: AuthLayout },
-    { path: '/register', component: Register, layout: AuthLayout },
+    { path: '/sign-in', component: Login, layout: AuthLayout },
+    { path: '/sign-up', component: Register, layout: AuthLayout },
+    { path: '/forgot-password', component: ForgotFwd, layout: AuthLayout },
 ]
 
 export const privateRoutes: PrivateRouteType[] = [

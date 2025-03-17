@@ -9,10 +9,10 @@ import NotFound from './pages/Error';
 
 // Add PrivateRoute component
 const PrivateRoute = ({ element, path }: { element: JSX.Element, path: string}) => {
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { token } = useSelector((state: RootState) => state.auth);
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" />;
+  if (!token) {
+    return <Navigate to="/sign-in" />;
   }
 
   return element;

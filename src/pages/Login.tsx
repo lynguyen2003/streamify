@@ -2,6 +2,7 @@ import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 import {
   Form,
@@ -15,23 +16,44 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Loader from "@/components/shared/Loader";
 import { useToast } from "@/components/ui/use-toast";
-
-import { SigninValidation } from "@/lib/validation";
+import { useAppSelector } from "@/hooks/useAppSelector";
+import { loginUser } from "@/features/auth/authSlice";
+import { useAppDispatch } from "@/hooks/useAppDispatch";
+import { LoginFormValidation } from "@/lib/validation";
+import { clearError } from "@/features/auth/authSlice";
 
 const Login = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { isLoading, error, token } = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
 
-  const form = useForm<z.infer<typeof SigninValidation>>({
-    resolver: zodResolver(SigninValidation),
+
+  const form = useForm<z.infer<typeof LoginFormValidation>>({
+    resolver: zodResolver(LoginFormValidation),
     defaultValues: {
       email: "",
       password: "",
     },
   });
 
-  const handleSignin = async (user: z.infer<typeof SigninValidation>) => {
-    console.log(user);
+  useEffect(() => {
+    if (token) {
+      navigate('/');
+    }
+    return () => {
+      dispatch(clearError());
+    };
+  }, [token, navigate, dispatch]);
+
+  const handleSignin = async (user: z.infer<typeof LoginFormValidation>) => {
+    try {
+      await dispatch(loginUser(user));
+      toast({ title: "Login successful" });
+    } catch (error) {
+      toast({ title: "Login failed" });
+      console.log(error);
+    }
   };
 
   return (
@@ -54,7 +76,9 @@ const Login = () => {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="shad-form_label">Email</FormLabel>
+                <FormLabel className="shad-form_label base-medium text-light-1">
+                  Email
+                </FormLabel>
                 <FormControl>
                   <Input type="text" className="shad-input" {...field} />
                 </FormControl>
@@ -68,7 +92,9 @@ const Login = () => {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="shad-form_label">Password</FormLabel>
+                <FormLabel className="shad-form_label base-medium text-light-1">
+                  Password
+                </FormLabel>
                 <FormControl>
                   <Input type="password" className="shad-input" {...field} />
                 </FormControl>
@@ -78,7 +104,13 @@ const Login = () => {
           />
 
           <Button type="submit" className="shad-button_primary">
-            Log in
+            {isLoading ? (
+              <div className="flex-center gap-2">
+                <Loader /> Loading...
+              </div>
+            ) : (
+              "Log in"
+            )}
           </Button>
 
           <p className="text-small-regular text-light-2 text-center mt-2">

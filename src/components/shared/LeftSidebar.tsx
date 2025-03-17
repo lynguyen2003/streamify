@@ -2,26 +2,27 @@ import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 
 import { INavLink } from "@/types";
 import { sidebarLinks } from "@/constants";
-import { Loader } from "@/components/shared";
 import { Button } from "@/components/ui/button";
-import { useSignOutAccount } from "@/lib/react-query/queries";
-import { useUserContext, INITIAL_USER } from "@/context/AuthContext";
+import { logoutUser } from "@/features/auth/authSlice";
+import { useToast } from "../ui/use-toast";
+import { useAppDispatch } from "@/hooks/useAppDispatch";
 
 const LeftSidebar = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const { pathname } = useLocation();
-  const { user, setUser, setIsAuthenticated, isLoading } = useUserContext();
-
-  const { mutate: signOut } = useSignOutAccount();
-
+  const { toast } = useToast();
+  
   const handleSignOut = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
-    signOut();
-    setIsAuthenticated(false);
-    setUser(INITIAL_USER);
-    navigate("/sign-in");
+    try {
+      await dispatch(logoutUser());
+      navigate("/login");
+    } catch (error) {
+      toast({ title: "Logout failed" });
+    }
   };
 
   return (
@@ -36,23 +37,17 @@ const LeftSidebar = () => {
           />
         </Link>
 
-        {isLoading || !user.email ? (
-          <div className="h-14">
-            <Loader />
-          </div>
-        ) : (
-          <Link to={`/profile/${user.id}`} className="flex gap-3 items-center">
+        <Link to={`/profile/123`} className="flex gap-3 items-center">
             <img
-              src={user.imageUrl || "/assets/icons/profile-placeholder.svg"}
+              src={"/assets/icons/profile-placeholder.svg"}
               alt="profile"
               className="h-14 w-14 rounded-full"
             />
             <div className="flex flex-col">
-              <p className="body-bold">{user.name}</p>
-              <p className="base-regular text-light-3">@{user.username}</p>
+              <p className="body-bold">John Doe</p>
+              <p className="base-regular text-light-3">@123</p>
             </div>
           </Link>
-        )}
 
         <div className="flex flex-col gap-1">
           {sidebarLinks.map((link: INavLink) => {
