@@ -5,9 +5,11 @@ import { Toaster } from "sonner";
 
 const DefaultLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="w-full md:flex">
+    <div className="h-screen w-full md:flex">
       <Topbar />
-      <LeftSidebar />
+      <div className="sticky top-0 left-0 z-10">
+        <LeftSidebar />
+      </div>
 
       <section className="flex flex-1 h-full">
         {children}

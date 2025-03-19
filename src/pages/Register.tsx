@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Loader from "@/components/shared/Loader";
-import { SignupValidation } from "@/lib/validation";
+import { UserValidation } from "@/lib/validation";
 import { toast } from "sonner";
 import { useAuthContext } from "@/context/AuthContext";
 
@@ -23,8 +23,8 @@ const Register = () => {
   const { register, activateUser, isLoading, error } = useAuthContext();
   const [otp, setOtp] = useState("");
 
-  const form = useForm<z.infer<typeof SignupValidation>>({
-    resolver: zodResolver(SignupValidation),
+  const form = useForm<z.infer<typeof UserValidation>>({
+    resolver: zodResolver(UserValidation),
     defaultValues: {
       email: "",
       password: "",
@@ -39,7 +39,7 @@ const Register = () => {
     return email && password;
   };
 
-  const handleSendCode = async (user: z.infer<typeof SignupValidation>) => {
+  const handleSendCode = async (user: z.infer<typeof UserValidation>) => {
     await register(user);
     if (error) {
       toast.error("Failed to send code", {
@@ -52,7 +52,7 @@ const Register = () => {
     }
   };
 
-  const handleContinue = async (user: z.infer<typeof SignupValidation>) => {
+  const handleContinue = async (user: z.infer<typeof UserValidation>) => {
     await activateUser(user.email, otp);
     if (error) {
       toast.error("Failed to activate user", {

@@ -1,8 +1,8 @@
-import { Models } from "appwrite";
 import { Link } from "react-router-dom";
+import { IPost } from "@/types";
 
 type GridPostListProps = {
-  posts: Models.Document[];
+  posts: IPost[];
   showUser?: boolean;
   showStats?: boolean;
 };
@@ -16,10 +16,10 @@ const GridPostList = ({
   return (
     <>
       {posts.map((post) => (
-        <li key={post.$id} className="relative min-w-80 h-80">
-          <Link to={`/posts/${post.$id}`} className="grid-post_link">
+        <li key={post._id} className="relative min-w-80 h-80">
+          <Link to={`/posts/${post._id}`} className="grid-post_link">
             <img
-              src={post.imageUrl}
+              src={post.mediaUrls[0]}
               alt="post"
               className="h-full w-full object-cover"
             />
@@ -31,13 +31,13 @@ const GridPostList = ({
                 <div className="flex items-center gap-2 flex-1">
                   <img
                     src={
-                      post.creator.imageUrl ||
+                      post.author.imageUrl ||
                       "/assets/icons/profile-placeholder.svg"
                     }
                     alt="creator"
                     className="w-8 h-8 rounded-full"
                   />
-                  <p className="line-clamp-1">{post.creator.name}</p>
+                  <p className="line-clamp-1">{post.author.username}</p>
                 </div>
                 {showStats && (
                   <div className="flex gap-2 mr-5">
@@ -49,7 +49,7 @@ const GridPostList = ({
                       className="cursor-pointer"
                     />
                     <p className="small-medium lg:base-medium my-auto">
-                      {post.likes.length}
+                      {post.likeCount}
                     </p>
                   </div>
                 )}

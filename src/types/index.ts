@@ -4,32 +4,34 @@ export type INavLink = {
   label: string;
 };
 
-export type IUpdateUser = {
-  userId: string;
+export type IAudio = {
   name: string;
-  bio: string;
-  imageId: string;
-  imageUrl: URL | string;
-  file: File[];
+  artist: string;
+  url: string;
 };
 
-export type INewPost = {
-  userId: string;
+export type IPost = {
+  _id: string;
+  author: IUser;
   caption: string;
-  file: File[];
-  location?: string;
-  tags?: string;
-};
-
-export type IUpdatePost = {
-  postId: string;
-  caption: string;
-  imageId: string;
-  imageUrl: URL;
-  file: File[];
-  location?: string;
-  tags?: string;
-};
+  tags: string[];
+  location: string;
+  mediaUrls: string[];
+  likes: IUser[];
+  saved: IUser[];
+  viewCount: number;
+  likeCount: number;
+  saveCount: number;
+  commentCount: number;
+  type: string;
+  mentions: IUser[];
+  privacy: string;
+  audio: IAudio;
+  duration: number;
+  expiresAt: string;
+  storyViews: IUser[];
+  createdAt: string;
+}
 
 export type IUser = {
   _id: string;
@@ -45,11 +47,5 @@ export type IUser = {
   followersCount: number;
   followingCount: number;
   friendsCount: number;
-};
-
-export type INewUser = {
-  name: string;
-  email: string;
-  username: string;
-  password: string;
+  posts: IPost[];
 };

@@ -7,6 +7,8 @@ import Register from "@/pages/Register";
 import DefaultLayout from "@/layouts/DefaultLayout";
 import AuthLayout from "@/layouts/AuthLayout";
 import ForgotFwd from "@/pages/ForgotFwd";
+import LikedPosts from "@/pages/LikedPosts"; 
+import UpdateProfile from "@/pages/UpdateProfile";
 
 interface RouteType {
     path: string;
@@ -25,7 +27,9 @@ export const publicRoutes: RouteType[] = [
 
 export const privateRoutes: PrivateRouteType[] = [
     { path: '/', component: Home, layout: DefaultLayout },
-    { path: '/profile', component: Profile, layout: null },
+    { path: '/profile/:id/*', component: Profile, layout: DefaultLayout },
+    { path: '/update-profile/:id', component: UpdateProfile, layout: DefaultLayout },
+    { path: '/liked-posts/:id', component: LikedPosts, layout: DefaultLayout },
 ]
 
 

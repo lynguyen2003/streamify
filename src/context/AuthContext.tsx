@@ -5,22 +5,10 @@ import { useAppDispatch } from '@/hooks/useAppDispatch';
 import { useAppSelector } from '@/hooks/useAppSelector';
 import { loginUser, registerUser, logoutUser, getUserById, verifyOTP } from '@/features/auth/authSlice';
 import { decodeToken, isTokenExpired } from '@/lib/utils/jwt';
+import { IUser } from '@/types';
 
-
-interface User {
-    _id: string;
-    email: string;
-    bio: string;
-    username: string;
-    phone: string;
-    imageUrl: string;
-    isActive: boolean;
-    registrationDate: string;
-    lastLogin: string;
-}
-
-interface IAuthContext {
-  user: User | null;
+type IAuthContext = {
+  user: IUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
@@ -31,7 +19,7 @@ interface IAuthContext {
   activateUser: (email: string, token: string) => Promise<boolean>;
 }
 
-interface RegisterUserParams {
+type RegisterUserParams = {
   email: string;
   password: string;
 }
@@ -39,7 +27,7 @@ interface RegisterUserParams {
 const AuthContext = createContext<IAuthContext | null>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<IUser | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const dispatch = useAppDispatch();
   const { token, error } = useAppSelector((state) => state.auth);

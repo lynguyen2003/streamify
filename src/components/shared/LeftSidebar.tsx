@@ -50,12 +50,11 @@ const LeftSidebar = () => {
               <p className="body-bold">{user?.username}</p>
               <p className="base-regular text-light-3">{user?.email}</p>
             </div>
-          </Link>
+        </Link>
 
         <div className="flex flex-col gap-1">
           {sidebarLinks.map((link: INavLink) => {
             const isActive = pathname === link.route;
-
             return (
               <div
                 key={link.label}

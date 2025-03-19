@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Loader from "@/components/shared/Loader";
-import { LoginFormValidation } from "@/lib/validation";
+import { LoginSchema } from "@/lib/validation";
 import { useAuthContext } from "@/context/AuthContext";
 import { toast } from "sonner";
 
@@ -25,15 +25,15 @@ const Login = () => {
   const [formError, setFormError] = useState<string | null>(null);
 
 
-  const form = useForm<z.infer<typeof LoginFormValidation>>({
-    resolver: zodResolver(LoginFormValidation),
+  const form = useForm<z.infer<typeof LoginSchema>>({
+    resolver: zodResolver(LoginSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
 
-  const handleLogin = async (user: z.infer<typeof LoginFormValidation>) => {
+  const handleLogin = async (user: z.infer<typeof LoginSchema>) => {
     setFormError(null);
     await login(user.email, user.password);
     if (error) {

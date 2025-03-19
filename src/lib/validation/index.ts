@@ -3,33 +3,35 @@ import * as z from "zod";
 // ============================================================
 // USER
 // ============================================================
-export const SignupValidation = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
+
+export const UserValidation = z.object({
+  email: z.string().email(),
   username: z
     .string()
     .min(2, { message: "Name must be at least 2 characters." }),
-  email: z.string().email(),
+  phone: z.string(),
+  imageUrl: z.string(),
+  bio: z.string(),
+  posts: z.array(z.string()),
   password: z
     .string()
     .min(8, { message: "Password must be at least 8 characters." }),
   otp: z.string().length(6, { message: "OTP must be 6 digits." }),
 });
 
-export const LoginFormValidation = z.object({
+export const LoginSchema = z.object({
   email: z.string().email(),
-  password: z
-    .string()
-    .min(8, { message: "Password must be at least 8 characters." }),
+  password: z.string().min(8, { message: "Password must be at least 8 characters." }),
 });
 
-export const ProfileValidation = z.object({
-  file: z.custom<File[]>(),
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
+export const UpdateUserSchema = z.object({
+  email: z.string().email(),
   username: z
     .string()
     .min(2, { message: "Name must be at least 2 characters." }),
-  email: z.string().email(),
+  phone: z.string(),
   bio: z.string(),
+  imageUrl: z.string(),
 });
 
 // ============================================================

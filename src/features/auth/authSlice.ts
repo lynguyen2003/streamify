@@ -56,6 +56,20 @@ const GET_USER_BY_ID = gql`
         isActive
         registrationDate
         lastLogin
+        followersCount
+        followingCount
+        friendsCount
+        posts {
+            _id
+            mediaUrls
+            caption
+            tags
+            location
+            likeCount
+            type
+            duration
+            expiresAt
+        }
     }
 }
 `;
