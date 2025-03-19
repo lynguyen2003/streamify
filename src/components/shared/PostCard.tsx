@@ -1,9 +1,8 @@
 import { Link } from "react-router-dom";
 
-import { PostStats } from "@/components/shared";
 import { multiFormatDateString } from "@/lib/utils";
 import { useAuthContext } from "@/context/AuthContext";
-import { IPost, IUser } from "@/types";
+import { IPost } from "@/types";
 
 
 type PostCardProps = {

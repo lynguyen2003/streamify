@@ -7,7 +7,7 @@ import Register from "@/pages/Register";
 import DefaultLayout from "@/layouts/DefaultLayout";
 import AuthLayout from "@/layouts/AuthLayout";
 import ForgotFwd from "@/pages/ForgotFwd";
-import LikedPosts from "@/pages/LikedPosts"; 
+import LikedPosts from "@/components/shared/LikedPosts"; 
 import UpdateProfile from "@/pages/UpdateProfile";
 
 interface RouteType {

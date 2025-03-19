@@ -21,6 +21,7 @@ const ForgotFwd = () => {
 
   const handleForgotPassword = async (data: z.infer<typeof ForgotPasswordValidation>) => {
     try {
+      console.log(data);
       toast.success("Password Reset Email Sent", {
         description: "Please check your email for further instructions.",
       });

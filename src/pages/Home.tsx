@@ -1,7 +1,6 @@
-import { Fragment, useEffect, useRef } from "react";
+import { Fragment, useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import { Loader, PostCard, UserCard } from "@/components/shared";
-import UserStory from "@/components/shared/UserStory";
 import useDebounce from "@/hooks/useDebounce";
 import { useInfinitePosts, useInfiniteUsers } from "@/lib/api/react-queries";
 
@@ -42,21 +41,6 @@ const Home = () => {
     fetchNextPageUsers
   ]);
 
-
-  // Ref cho horizontal scroll (phần UserStory)
-  const scrollContainerRef = useRef<HTMLUListElement>(null);
-
-  const scrollLeft = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: -200, behavior: 'smooth' });
-    }
-  };
-
-  const scrollRight = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: 200, behavior: 'smooth' });
-    }
-  };
 
   return (
     <div className="flex flex-1">

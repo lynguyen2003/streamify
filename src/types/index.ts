@@ -49,3 +49,11 @@ export type IUser = {
   friendsCount: number;
   posts: IPost[];
 };
+
+export type IUpdateUser = {
+  email: string;
+  username: string;
+  phone: string;
+  imageUrl: string;
+  bio: string;
+}

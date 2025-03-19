@@ -1,7 +1,7 @@
-import { Models } from "appwrite";
+import { IUser } from "@/types";
 
 type UserStoryProps = {
-  user: Models.Document;
+  user: IUser;
 };
 
 const UserStory = ({ user }: UserStoryProps) => {

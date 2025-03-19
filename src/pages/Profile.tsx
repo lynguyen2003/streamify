@@ -4,7 +4,6 @@ import {
   useLocation,
   Route,
   Routes,
-  Outlet,
 } from "react-router-dom";
 
 import { Button } from "@/components/ui";
@@ -12,37 +11,27 @@ import { GridPostList, Loader } from "@/components/shared";
 import { useAppSelector } from "@/hooks/useAppSelector";
 
 import { RootState } from "@/store";
-import LikedPosts from "@/pages/LikedPosts";
-import { useEffect } from "react";
-import { useAppDispatch } from "@/hooks/useAppDispatch";
-import { useGetUserById } from "@/lib/api/react-queries";
-type StabBlockProps = {
-  value: string | number;
-  label: string;
-}
+import LikedPosts from "@/components/shared/LikedPosts";
+import { 
+  useGetUserById, 
+  useGetFriendshipStatus, 
+  useAddFriendMutation, 
+  useCancelFriendRequestMutation 
+} from "@/lib/api/react-queries";
+import StatBlock from "@/components/shared/StatBlock";
 
-const StatBlock = ({ value, label }: StabBlockProps) => (
-  <div className="flex-center gap-2">
-    <p className="small-semibold lg:body-bold text-primary-500">{value}</p>
-    <p className="small-medium lg:base-medium text-light-2">{label}</p>
-  </div>
-);
 
 const Profile = () => {
   const { id } = useParams();
   const { pathname } = useLocation();
-  const dispatch = useAppDispatch();  
-  const state = useLocation().state;
+
   const { user: authUser } = useAppSelector((state: RootState) => state.auth);
   const { data: user} = useGetUserById(id || "");
+  const { data: friendshipStatus } = useGetFriendshipStatus(id || "");
+  const { addFriend, loading: addFriendLoading } = useAddFriendMutation();
+  const { cancelFriendRequest, loading: cancelRequestLoading } = useCancelFriendRequestMutation();
 
-
-
-  useEffect(() => {
-    if (state && state.refresh) {
-      window.history.replaceState({}, document.title);
-    }
-  }, [dispatch, id, state]);
+  console.log(friendshipStatus?.status);
 
   if (!user)
     return (
@@ -92,16 +81,40 @@ const Profile = () => {
                     </p>
                   </Link>
                 )}
+
                 {authUser?._id !== user._id && (
                   <Button size="sm" className="shad-button_primary px-8">
                     Follow
                   </Button>
                 )}
-                {authUser?._id !== user._id && (
-                  <Button size="sm" className="bg-white text-black">
-                    Add Friend
+                
+                {authUser?._id !== user._id && 
+                  (!friendshipStatus?.status || friendshipStatus?.status === 'rejected') && (
+                  <Button 
+                    size="sm" 
+                    className="bg-white text-black" 
+                    onClick={() => addFriend(user._id)}
+                    disabled={addFriendLoading}
+                  >
+                    {addFriendLoading ? <Loader /> : "Add Friend"}
                   </Button>
                 )}
+                
+                {friendshipStatus?.status === "pending" && (
+                  <Button 
+                    size="sm" 
+                    className="bg-white text-black" 
+                    onClick={() => cancelFriendRequest(user._id)}
+                    disabled={cancelRequestLoading}
+                  >  
+                    {cancelRequestLoading ? <Loader /> : "Cancel Request"} 
+                  </Button>
+                )}
+
+                {friendshipStatus?.status === "accepted" && (
+                  <Button size="sm" className="bg-white text-black">Friend</Button>
+                )}
+                
                 {authUser?._id !== user._id && (
                   <Button size="sm" className="bg-white  text-black">
                     Message
@@ -123,7 +136,7 @@ const Profile = () => {
         </div>
       </div>
 
-      {authUser?._id === user._id && (
+      {authUser?._id && user._id && (
         <div className="flex max-w-5xl w-full">
           <Link
             to={`/profile/${id}`}
@@ -165,8 +178,17 @@ const Profile = () => {
                 </ul>
               ) : (
                 <div className="flex-center flex-col gap-4 h-full w-full py-10">
-                  <p className="text-light-3 text-xl font-medium">Upload your first post</p>
-                  <p className="text-light-4">Your posts will appear here</p>
+                  {authUser?._id === user._id ? (
+                    <>
+                      <p className="text-light-3 text-xl font-medium">Upload your first post</p>
+                      <p className="text-light-4">Your posts will appear here</p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-light-3 text-xl font-medium">This user has no posts yet</p>
+                      <p className="text-light-4">When they post, their posts will appear here</p>
+                    </>
+                  )}
                 </div>
               )
             }

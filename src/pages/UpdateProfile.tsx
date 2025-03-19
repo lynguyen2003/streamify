@@ -18,17 +18,13 @@ import { toast } from "sonner";
 import { UpdateUserSchema } from "@/lib/validation";
 import { useAppSelector } from "@/hooks/useAppSelector";
 import { RootState } from "@/store";
-import { useState } from "react";
-import { IUser } from "@/types";
-import { updateUser } from "@/features/user/userSlice";
-import { useAppDispatch } from "@/hooks/useAppDispatch";
+import { useUpdateUserMutation } from "@/lib/api/react-queries";
 
 const UpdateProfile = () => {
     const navigate = useNavigate();
-    const dispatch = useAppDispatch();
     const { id } = useParams();
-    const { user: currentUser, isLoading: isLoadingAuth } = useAppSelector((state: RootState) => state.auth);
-
+    const { user: currentUser } = useAppSelector((state: RootState) => state.auth);
+    const { updateUser, loading } = useUpdateUserMutation();
 
     const form = useForm<z.infer<typeof UpdateUserSchema>>({
         resolver: zodResolver(UpdateUserSchema),
@@ -57,9 +53,9 @@ const UpdateProfile = () => {
             bio: values.bio,
             imageUrl: values.imageUrl,
         }
-        const resultAction = await dispatch(updateUser(updatedUser));
+        const resultAction = await updateUser(updatedUser);
 
-        if (updateUser.fulfilled.match(resultAction)) {
+        if (resultAction.data) {
             toast.success("Profile updated successfully");
             window.location.href = `/profile/${id}`;
         } else {
@@ -180,7 +176,7 @@ const UpdateProfile = () => {
                     type="submit"
                     className="shad-button_primary whitespace-nowrap"
                     >
-                    {isLoadingAuth && <Loader />}
+                    {loading && <Loader />}
                     Update Profile
                 </Button>
                 </div>

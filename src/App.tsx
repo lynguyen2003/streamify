@@ -11,11 +11,7 @@ import { AuthProvider } from './context/AuthContext';
 const PrivateRoute = ({ element, path }: { element: JSX.Element, path: string}) => {
   const { token } = useSelector((state: RootState) => state.auth);
 
-  if (!token) {
-    return <Navigate to="/sign-in" />;
-  }
-
-  return element;
+  return token ? element : <Navigate to="/sign-in" replace state={{ from: path }} />;
 };
 
 function App() {
