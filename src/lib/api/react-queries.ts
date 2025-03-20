@@ -4,12 +4,14 @@ import {
   useQueryClient
 } from '@tanstack/react-query';
 import { apolloClient } from '@/lib/api/apiSlice';
-import { GET_POSTS, GET_USER_BY_ID, GET_LIKED_POSTS, GET_USERS, GET_FRIENDSHIP_STATUS } from '@/graphql/queries';
-import { ACCEPT_FRIEND_REQUEST, ADD_FRIEND, BLOCK_USER, CANCEL_FRIEND_REQUEST, REJECT_FRIEND_REQUEST, UNFRIEND, UPDATE_USER } from '@/graphql/mutations';
+import { GET_POSTS, GET_USER_BY_ID, GET_LIKED_POSTS, GET_USERS, GET_FRIENDSHIP_STATUS, IS_FOLLOWING } from '@/graphql/queries';
+import { ACCEPT_FRIEND_REQUEST, ADD_FRIEND, BLOCK_USER, CANCEL_FRIEND_REQUEST, FOLLOW_USER, REJECT_FRIEND_REQUEST, UNFOLLOW_USER, UNFRIEND, UPDATE_USER } from '@/graphql/mutations';
 import { useMutation } from '@apollo/client';
 import { toast } from 'sonner';
 import { IUpdateUser } from '@/types';
 import { QUERY_KEYS } from './queriesKeys';
+import { useCallback, useState } from 'react';
+import { useEffect } from 'react';
 // ========== POSTS ==========
 
 async function getInfinitePosts({ pageParam = null }: { pageParam: string | null }) {
@@ -57,6 +59,14 @@ async function getFriendshipStatus({ userId }: { userId: string }) {
   return data.friendshipStatus;
 }
 
+async function getIsFollowing({ userId }: { userId: string }) {
+  const { data } = await apolloClient.query({
+    query: IS_FOLLOWING,
+    variables: { userId },
+    fetchPolicy: 'network-only'
+  });
+  return data.isFollowing;
+}
 // =====================================
 // ========== USE REACT QUERY ==========
 // =====================================
@@ -106,6 +116,13 @@ export const useGetFriendshipStatus = (userId: string) => {
     queryFn: () => getFriendshipStatus({ userId })
   });
 }
+
+export const useIsFollowing = (userId: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.IS_FOLLOWING, userId],
+    queryFn: () => getIsFollowing({ userId })
+  });
+}   
 
 /** useMutation */
 
@@ -289,4 +306,41 @@ export const useBlockUserMutation = () => {
     error
   };
 }
+
+export const useFollowUserMutation = () => {
+  const [followUserMutation, { loading, error }] = useMutation(FOLLOW_USER, {
+    onCompleted: () => {
+      toast.success('User followed successfully');
+    },
+    onError: () => {
+      toast.error(`An error occurred while doing the action`);
+    }
+  });
+
+  return {
+    followUser: (userId: string) => followUserMutation({ variables: { userId } }),
+    loading,
+    error
+  };
+}
+
+export const useUnfollowUserMutation = () => {
+  const [unfollowUserMutation, { loading, error }] = useMutation(UNFOLLOW_USER, {
+    onCompleted: () => {
+      toast.success('User unfollowed successfully');
+    },
+    onError: () => {
+      toast.error(`An error occurred while doing the action`);
+    }
+  });
+
+  return {
+    unfollowUser: (userId: string) => unfollowUserMutation({ variables: { userId } }),
+    loading,
+    error
+  };
+} 
+
+
+
 

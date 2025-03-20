@@ -121,3 +121,11 @@ export const GET_FRIENDSHIP_STATUS = gql`
     }
 }
 `;
+
+// ========== FOLLOWING STATUS ==========
+
+export const IS_FOLLOWING = gql`
+  query IsFollowing($userId: String!) {
+    isFollowing(userId: $userId)
+  }
+`;

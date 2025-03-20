@@ -19,7 +19,10 @@ import {
   useRejectFriendRequestMutation,
   useAcceptFriendRequestMutation,
   useUnfriendMutation,
-  useCancelFriendRequestMutation
+  useCancelFriendRequestMutation,
+  useFollowUserMutation,
+  useUnfollowUserMutation,
+  useIsFollowing
 } from "@/lib/api/react-queries";
 import StatBlock from "@/components/shared/StatBlock";
 import { Badge } from "@/components/ui/badge";
@@ -36,6 +39,9 @@ const Profile = () => {
   const { rejectFriendRequest, loading: rejectRequestLoading } = useRejectFriendRequestMutation();
   const { acceptFriendRequest, loading: acceptRequestLoading } = useAcceptFriendRequestMutation();
   const { unfriend, loading: unfriendLoading } = useUnfriendMutation();
+  const { data: isFollowing, refetch: refetchFollowStatus } = useIsFollowing(id || "");
+  const { followUser, loading: followLoading } = useFollowUserMutation();
+  const { unfollowUser, loading: unfollowLoading } = useUnfollowUserMutation();
 
   const handleFriendAction = async () => {
     if (authUser?._id === user?._id) return;
@@ -65,6 +71,16 @@ const Profile = () => {
   }
   };
 
+  const handleFollowAction = async () => {
+    if (authUser?._id === user?._id) return;
+    if (isFollowing) {
+      await unfollowUser(id || "");
+    } else {
+      await followUser(id || "");
+    }
+    await refetchFollowStatus();
+  };
+
   const getFriendButtonText = () => {
     if (addFriendLoading || cancelRequestLoading || rejectRequestLoading || 
         acceptRequestLoading || unfriendLoading) {
@@ -88,6 +104,14 @@ const Profile = () => {
     }
    
     return "Add Friend";
+  };
+
+  const getFollowButtonText = () => {
+    if (followLoading || unfollowLoading) {
+      return <Loader />;
+    }
+    
+    return isFollowing ? "Unfollow" : "Follow";
   };
 
   if (!user)
@@ -142,8 +166,13 @@ const Profile = () => {
                   </Link>
                 ) : (
                   <>
-                    <Button size="sm" className="shad-button_primary px-8">
-                      Follow
+                    <Button 
+                      size="sm" 
+                      className="shad-button_primary px-8"
+                      onClick={handleFollowAction}
+                      disabled={followLoading || unfollowLoading}
+                    >
+                      {getFollowButtonText()}
                     </Button>
                     
                     <Button 

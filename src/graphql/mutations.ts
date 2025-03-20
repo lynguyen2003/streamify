@@ -108,6 +108,24 @@ export const UNBLOCK_USER = gql`
   }
 `;
 
+export const FOLLOW_USER = gql`
+  mutation FollowUser($userId: String!) {
+    follow(userId: $userId)
+  }
+`;
+
+export const UNFOLLOW_USER = gql`
+  mutation UnfollowUser($userId: String!) {
+    unfollow(userId: $userId)
+  }
+`;
+
+
+
+
+
+
+
 
 
 
