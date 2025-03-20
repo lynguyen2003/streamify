@@ -111,6 +111,12 @@ export const GET_FRIENDSHIP_STATUS = gql`
     friendshipStatus(userId: $userId) {
         _id
         createdAt
+        requester {
+          _id
+        }
+        recipient {
+          _id
+        }
         status
     }
 }

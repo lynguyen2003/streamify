@@ -5,11 +5,11 @@ import {
 } from '@tanstack/react-query';
 import { apolloClient } from '@/lib/api/apiSlice';
 import { GET_POSTS, GET_USER_BY_ID, GET_LIKED_POSTS, GET_USERS, GET_FRIENDSHIP_STATUS } from '@/graphql/queries';
-import { ADD_FRIEND, CANCEL_FRIEND_REQUEST, UPDATE_USER } from '@/graphql/mutations';
+import { ACCEPT_FRIEND_REQUEST, ADD_FRIEND, BLOCK_USER, CANCEL_FRIEND_REQUEST, REJECT_FRIEND_REQUEST, UNFRIEND, UPDATE_USER } from '@/graphql/mutations';
 import { useMutation } from '@apollo/client';
 import { toast } from 'sonner';
 import { IUpdateUser } from '@/types';
-
+import { QUERY_KEYS } from './queriesKeys';
 // ========== POSTS ==========
 
 async function getInfinitePosts({ pageParam = null }: { pageParam: string | null }) {
@@ -65,7 +65,7 @@ async function getFriendshipStatus({ userId }: { userId: string }) {
 
 export const useInfinitePosts = () => {
   return useInfiniteQuery({
-    queryKey: ['getInfinitePosts'],
+    queryKey: [QUERY_KEYS.GET_INFINITE_POSTS],
     queryFn: getInfinitePosts,
     initialPageParam: null,
     getNextPageParam: (lastPage: any) => 
@@ -75,7 +75,7 @@ export const useInfinitePosts = () => {
 
 export const useInfiniteUsers = () => {
   return useInfiniteQuery({
-    queryKey: ['getInfiniteUsers'],
+    queryKey: [QUERY_KEYS.GET_INFINITE_USERS],
     queryFn: getInfiniteUsers,
     initialPageParam: null,
     getNextPageParam: (lastPage: any) => 
@@ -87,7 +87,7 @@ export const useInfiniteUsers = () => {
 
 export const useGetUserById = (userId: string) => {
   return useQuery({
-    queryKey: ['getUserById', userId],
+    queryKey: [QUERY_KEYS.GET_USER_BY_ID, userId],
     queryFn: () => getUserById({ userId }),
     enabled: !!userId,
   });
@@ -95,16 +95,15 @@ export const useGetUserById = (userId: string) => {
 
 export const useGetUserLikedPosts = (userId: string) => {
   return useQuery({
-    queryKey: ['getUserLikedPosts', userId],
+    queryKey: [QUERY_KEYS.GET_USER_LIKED_POSTS, userId],
     queryFn: () => getLikedPosts({ userId }),
   }); 
 }
 
 export const useGetFriendshipStatus = (userId: string) => {
   return useQuery({
-    queryKey: ['getFriendshipStatus', userId],
-    queryFn: () => getFriendshipStatus({ userId }),
-    enabled: !!userId,
+    queryKey: [QUERY_KEYS.GET_FRIENDSHIP_STATUS, userId],
+    queryFn: () => getFriendshipStatus({ userId })
   });
 }
 
@@ -130,14 +129,19 @@ export const useUpdateUserMutation = () => {
 export const useAddFriendMutation = () => {
   const queryClient = useQueryClient();
   const [addFriendMutation, { loading, error }] = useMutation(ADD_FRIEND, {
-    onCompleted: (data) => {
+    onCompleted: (variables) => {
       toast.success('Friend request sent successfully');
-      queryClient.setQueryData(['getFriendshipStatus', data.addFriend.userId], {
-        status: 'pending'
+      queryClient.invalidateQueries({ 
+        queryKey: [QUERY_KEYS.GET_FRIENDSHIP_STATUS, variables.userId],
+        refetchType: 'active'
+      });
+      queryClient.invalidateQueries({ 
+        queryKey: [QUERY_KEYS.GET_USER_BY_ID, variables.userId],
+        refetchType: 'active'
       });
     },
-    onError: () => {
-      toast.error('Failed to send friend request');
+    onError: (error) => {
+      toast.error(`Failed to send friend request: ${error.message}`);
     }
   });
 
@@ -153,19 +157,136 @@ export const useCancelFriendRequestMutation = () => {
   const [cancelFriendRequestMutation, { loading, error }] = useMutation(CANCEL_FRIEND_REQUEST, {
     onCompleted: (data) => {
       toast.success('Friend request cancelled successfully');
-      queryClient.setQueryData(['getFriendshipStatus', data.cancelFriendRequest.userId], {
-        status: 'rejected'
+      queryClient.invalidateQueries({ 
+        queryKey: [QUERY_KEYS.GET_FRIENDSHIP_STATUS, data.cancelFriendRequest.recipient._id],
+        refetchType: 'active' 
+      });
+      queryClient.invalidateQueries({ 
+        queryKey: [QUERY_KEYS.GET_USER_BY_ID, data.cancelFriendRequest.recipient._id],
+        refetchType: 'active'
       });
     },
-    onError: () => {
-      toast.error('Failed to cancel friend request');
+    onError: (error) => {
+      toast.error(`Failed to cancel friend request: ${error.message}`);
     }
   });
 
   return {
-    cancelFriendRequest: (userId: string) => cancelFriendRequestMutation({ variables: { userId } }),
+    cancelFriendRequest: (requestId: string) => cancelFriendRequestMutation({ variables: { requestId } }),
+    loading,  
+    error
+  };
+}
+
+export const useRejectFriendRequestMutation = () => {
+  const queryClient = useQueryClient();
+  const [rejectFriendRequestMutation, { loading, error }] = useMutation(REJECT_FRIEND_REQUEST, {
+    onCompleted: (data) => {
+      toast.success('Friend request rejected successfully');
+      queryClient.invalidateQueries({ 
+        queryKey: [QUERY_KEYS.GET_FRIENDSHIP_STATUS, data.rejectFriendRequest.requester._id],
+        refetchType: 'active'
+      });
+      queryClient.invalidateQueries({ 
+        queryKey: [QUERY_KEYS.GET_USER_BY_ID, data.rejectFriendRequest.requester._id],
+        refetchType: 'active'
+      });
+    },
+    onError: (error) => {
+      toast.error(`Failed to reject friend request: ${error.message}`);
+    }
+  });
+
+  return {
+    rejectFriendRequest: (requestId: string) => rejectFriendRequestMutation({ variables: { requestId } }),
     loading,
     error
   };
-}   
+}
+
+export const useAcceptFriendRequestMutation = () => {
+  const queryClient = useQueryClient();
+  const [acceptFriendRequestMutation, { loading, error }] = useMutation(ACCEPT_FRIEND_REQUEST, {
+    onCompleted: (data) => {
+      toast.success('Friend request accepted successfully');  
+      queryClient.invalidateQueries({ 
+        queryKey: [QUERY_KEYS.GET_FRIENDSHIP_STATUS, data.acceptFriendRequest.requester._id],
+        refetchType: 'active'
+      });
+      queryClient.invalidateQueries({ 
+        queryKey: [QUERY_KEYS.GET_USER_BY_ID, data.acceptFriendRequest.requester._id],
+        refetchType: 'active'
+      });
+      const currentUserId = data.acceptFriendRequest.recipient._id;
+      if (currentUserId) {
+        queryClient.invalidateQueries({ 
+          queryKey: [QUERY_KEYS.GET_USER_BY_ID, currentUserId],
+          refetchType: 'active'
+        });
+      }
+    },
+    onError: (error) => {
+      toast.error(`Failed to accept friend request: ${error.message}`);
+    }
+  });
+
+  return {
+    acceptFriendRequest: (requestId: string) => acceptFriendRequestMutation({ variables: { requestId } }),
+    loading,
+    error
+  };
+}
+
+export const useUnfriendMutation = () => {
+  const queryClient = useQueryClient();
+  const [unfriendMutation, { loading, error }] = useMutation(UNFRIEND, {
+    onCompleted: (data) => {
+      toast.success('Friend removed successfully');
+      const userId = data;
+      if (userId) {
+        queryClient.removeQueries({ queryKey: [QUERY_KEYS.GET_FRIENDSHIP_STATUS, userId] });
+        
+        queryClient.invalidateQueries({ 
+          queryKey: [QUERY_KEYS.GET_FRIENDSHIP_STATUS, userId],
+          refetchType: 'active'
+        });
+        
+        queryClient.invalidateQueries({ 
+          queryKey: [QUERY_KEYS.GET_USER_BY_ID, userId],
+          refetchType: 'active' 
+        });
+        
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.GET_USER_BY_ID],
+          refetchType: 'active'
+        });
+      }
+    },
+    onError: (error) => {
+      toast.error(`Failed to unfriend: ${error.message}`);
+    }
+  }); 
+
+  return {
+    unfriend: (userId: string) => unfriendMutation({ variables: { userId } }),
+    loading,
+    error
+  };
+}
+
+export const useBlockUserMutation = () => {
+  const queryClient = useQueryClient();
+  const [blockUserMutation, { loading, error }] = useMutation(BLOCK_USER, {
+    onCompleted: (data) => {
+      toast.success('User blocked successfully');
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_FRIENDSHIP_STATUS, data.blockUser.userId] });
+    },
+  });
+  
+  return {
+    blockUser: (userId: string) => blockUserMutation({ variables: { userId } }),
+    loading,
+    error
+  };
+}
 

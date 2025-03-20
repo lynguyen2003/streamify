@@ -27,13 +27,33 @@ export const UPDATE_USER = gql`
 
 export const ADD_FRIEND = gql`
   mutation AddFriend($userId: String!) {
-    addFriend(userId: $userId)
+    addFriend(userId: $userId){
+      _id
+      requester {
+        _id
+      }
+      recipient {
+        _id
+      }
+      status
+      createdAt
+    }
   }
 `;
 
 export const CANCEL_FRIEND_REQUEST = gql`
-  mutation CancelFriendRequest($userId: String!) {
-    cancelFriendRequest(userId: $userId)
+  mutation CancelFriendRequest($requestId: String!) {
+    cancelFriendRequest(requestId: $requestId) {
+      _id
+      requester {
+        _id
+      }
+      recipient {
+        _id
+      }
+      status
+      createdAt
+    }
   }
 `;
 
@@ -41,6 +61,54 @@ export const ACCEPT_FRIEND_REQUEST = gql`
   mutation AcceptFriendRequest($requestId: String!) {
     acceptFriendRequest(requestId: $requestId) {
       _id
+      requester {
+        _id
+      }
+      recipient {
+        _id
+      }
+      status
+      createdAt
     }
   }
 `;
+
+export const REJECT_FRIEND_REQUEST = gql`
+  mutation RejectFriendRequest($requestId: String!) {
+  rejectFriendRequest(requestId: $requestId) {
+    _id
+    createdAt
+    requester {
+      _id
+    }
+    recipient {
+      _id
+    }
+    status
+    updatedAt
+  }
+}
+`;
+
+export const UNFRIEND = gql`
+  mutation Unfriend($userId: String!) {
+    unfriend(userId: $userId)
+  }
+`;
+
+export const BLOCK_USER = gql`
+  mutation BlockUser($userId: String!) {
+    blockUser(userId: $userId)
+  }
+`;
+
+export const UNBLOCK_USER = gql`
+  mutation UnblockUser($userId: String!) {
+    unblockUser(userId: $userId)
+  }
+`;
+
+
+
+
+
