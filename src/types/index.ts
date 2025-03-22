@@ -18,7 +18,7 @@ export type IPost = {
   location: string;
   mediaUrls: string[];
   likes: IUser[];
-  saved: IUser[];
+  saves: IUser[];
   viewCount: number;
   likeCount: number;
   saveCount: number;

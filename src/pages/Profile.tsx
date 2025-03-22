@@ -31,17 +31,20 @@ const Profile = () => {
   const { id } = useParams();
   const { pathname } = useLocation();
   const navigate = useNavigate();
+
   const { user: authUser } = useAppSelector((state: RootState) => state.auth);
   const { data: user } = useGetUserById(id || "");
   const { data: friendshipStatus, refetch: refetchFriendshipStatus } = useGetFriendshipStatus(id || "");
+  const { data: isFollowing, refetch: refetchFollowStatus } = useIsFollowing(id || "");
+
   const { addFriend, loading: addFriendLoading } = useAddFriendMutation();
   const { cancelFriendRequest, loading: cancelRequestLoading } = useCancelFriendRequestMutation();
   const { rejectFriendRequest, loading: rejectRequestLoading } = useRejectFriendRequestMutation();
   const { acceptFriendRequest, loading: acceptRequestLoading } = useAcceptFriendRequestMutation();
   const { unfriend, loading: unfriendLoading } = useUnfriendMutation();
-  const { data: isFollowing, refetch: refetchFollowStatus } = useIsFollowing(id || "");
   const { followUser, loading: followLoading } = useFollowUserMutation();
   const { unfollowUser, loading: unfollowLoading } = useUnfollowUserMutation();
+
 
   const handleFriendAction = async () => {
     if (authUser?._id === user?._id) return;
@@ -134,14 +137,17 @@ const Profile = () => {
           />
 
           <div className="flex flex-col flex-1 justify-between md:mt-2">
-            <div className="flex flex-row w-full">
+            <div className="flex flex-row  w-full">
               <div className="flex-1 flex flex-col">
                 <div className="flex flex-row relative">
                   <h1 className="text-center xl:text-left h3-bold md:h1-semibold w-full">
                     {user.username}
                   </h1>
                   {friendshipStatus?.status === 'accepted' && (
-                    <Badge variant="outline" className="absolute left-48 bottom-0 mb-2 ml-2">Friend</Badge>
+                    <Badge variant="outline" className="absolute left-80 bottom-0 mb-2 ml-2">Friend</Badge>
+                  )}
+                  {user.isActive && (
+                    <Badge variant="outline" className="absolute left-48 bottom-0 mb-2 ml-2">Actived</Badge>
                   )}
                 </div>
                 <p className="small-regular md:body-medium text-light-3 text-center xl:text-left">
@@ -149,7 +155,7 @@ const Profile = () => {
                 </p>
               </div>
 
-              <div className="flex gap-4">
+              <div className="flex gap-2">
                 {authUser?._id === user._id ? (
                   <Link
                     to={`/update-profile/${user._id}`}
@@ -250,9 +256,9 @@ const Profile = () => {
           <Route
             index
             element={
-              user.posts && user.posts.length > 0 ? (
+              user.posts ? (
                 <ul className="user-grid">
-                  <GridPostList posts={user.posts} showUser={false} />
+                  <GridPostList posts={user.posts} showUser={false} showStats={true} />
                 </ul>
               ) : (
                 <div className="flex-center flex-col gap-4 h-full w-full py-10">

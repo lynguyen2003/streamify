@@ -120,6 +120,31 @@ export const UNFOLLOW_USER = gql`
   }
 `;
 
+export const TOGGLE_LIKE_POST = gql`
+  mutation ToggleLikePost($id: String!) {
+    toggleLikePost(id: $id) {
+      _id
+      likes {
+        _id
+      }
+      likeCount
+    }
+  }
+`;
+
+export const TOGGLE_SAVE_POST = gql`
+  mutation ToggleSavePost($id: String!) {
+    toggleSavePost(id: $id) {
+      _id
+      saves {
+        _id
+      }
+      saveCount
+    }
+  }
+`;
+
+
 
 
 

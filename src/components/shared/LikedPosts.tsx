@@ -7,6 +7,10 @@ interface LikedPostsProps {
 
 const LikedPosts = ({ userId }: LikedPostsProps) => {
   const { data, isLoading } = useGetUserLikedPosts(userId);
+
+  const likedPosts = data?.filter((post: any) =>  
+    post.author._id !== userId
+  );
   
   if (isLoading) {
     return (
@@ -16,7 +20,7 @@ const LikedPosts = ({ userId }: LikedPostsProps) => {
     );
   }
 
-  if (!data || data.length === 0) {
+  if (!likedPosts || likedPosts.length === 0) {
     return (
       <div className="flex-center flex-col gap-4 h-full w-full py-10">
         <p className="text-light-3 text-xl font-medium">No posts liked yet</p>
@@ -27,7 +31,7 @@ const LikedPosts = ({ userId }: LikedPostsProps) => {
 
   return (
     <ul className="user-grid">
-      <GridPostList posts={data} showUser={true} />
+      <GridPostList posts={likedPosts} showUser={true} />
     </ul>
   );
 };

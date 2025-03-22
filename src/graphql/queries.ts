@@ -8,22 +8,41 @@ export const GET_POSTS = gql`
     edges {
       node {
         _id
+        audio {
+          artist
+          name
+          url
+        }
         author {
           _id
+          email
           username
           imageUrl
         }
         caption
         commentCount
+        duration
+        expiresAt
         likeCount
+        likes {
+          _id
+        }
         location
         mediaUrls
         mentions {
+          _id
           username
         }
+        privacy
         saveCount
-        viewCount
+        saves {
+          _id
+        }
         tags
+        type
+        viewCount
+        createdAt
+        updatedAt
       }
     }
     pageInfo {
@@ -33,6 +52,25 @@ export const GET_POSTS = gql`
   }
 }
 `;
+
+// ========== POST BY ID ==========
+
+export const GET_POST_BY_ID = gql`
+  query Post($postId: String!) {
+    post(id: $postId) {
+      _id 
+      likes {
+        _id
+      }
+      saved {
+        _id
+      }
+      likeCount
+      saveCount
+    }
+  }
+`;
+
 
 // ========== LIKED POSTS ==========
 
@@ -48,12 +86,18 @@ export const GET_LIKED_POSTS = gql`
     caption
     commentCount
     likeCount
+    likes {
+      _id
+    }
+    saveCount
+    saves {
+      _id
+    }
     location
     mediaUrls
     mentions {
       username
     }
-    saveCount
     viewCount
     tags
   }  
@@ -94,6 +138,21 @@ export const GET_USER_BY_ID = gql`
         phone
         username
         imageUrl
+        posts {
+          _id
+          mediaUrls
+          caption
+          location
+          tags
+          type
+          privacy
+          likeCount
+          saveCount
+          commentCount
+          viewCount
+          createdAt
+          updatedAt
+        }
         followersCount
         followingCount
         friendsCount

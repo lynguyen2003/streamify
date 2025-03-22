@@ -4,14 +4,12 @@ import {
   useQueryClient
 } from '@tanstack/react-query';
 import { apolloClient } from '@/lib/api/apiSlice';
-import { GET_POSTS, GET_USER_BY_ID, GET_LIKED_POSTS, GET_USERS, GET_FRIENDSHIP_STATUS, IS_FOLLOWING } from '@/graphql/queries';
-import { ACCEPT_FRIEND_REQUEST, ADD_FRIEND, BLOCK_USER, CANCEL_FRIEND_REQUEST, FOLLOW_USER, REJECT_FRIEND_REQUEST, UNFOLLOW_USER, UNFRIEND, UPDATE_USER } from '@/graphql/mutations';
+import { GET_POSTS, GET_USER_BY_ID, GET_LIKED_POSTS, GET_USERS, GET_FRIENDSHIP_STATUS, IS_FOLLOWING, GET_POST_BY_ID } from '@/graphql/queries';
+import { ACCEPT_FRIEND_REQUEST, ADD_FRIEND, BLOCK_USER, CANCEL_FRIEND_REQUEST, FOLLOW_USER, REJECT_FRIEND_REQUEST, TOGGLE_LIKE_POST, TOGGLE_SAVE_POST, UNFOLLOW_USER, UNFRIEND, UPDATE_USER } from '@/graphql/mutations';
 import { useMutation } from '@apollo/client';
 import { toast } from 'sonner';
 import { IUpdateUser } from '@/types';
 import { QUERY_KEYS } from './queriesKeys';
-import { useCallback, useState } from 'react';
-import { useEffect } from 'react';
 // ========== POSTS ==========
 
 async function getInfinitePosts({ pageParam = null }: { pageParam: string | null }) {
@@ -63,9 +61,17 @@ async function getIsFollowing({ userId }: { userId: string }) {
   const { data } = await apolloClient.query({
     query: IS_FOLLOWING,
     variables: { userId },
-    fetchPolicy: 'network-only'
+    fetchPolicy: 'no-cache'
   });
   return data.isFollowing;
+}
+
+async function getPostById({ postId }: { postId: string }) {
+  const { data } = await apolloClient.query({
+    query: GET_POST_BY_ID,
+    variables: { postId }
+  });
+  return data.post;
 }
 // =====================================
 // ========== USE REACT QUERY ==========
@@ -123,6 +129,13 @@ export const useIsFollowing = (userId: string) => {
     queryFn: () => getIsFollowing({ userId })
   });
 }   
+
+export const useGetPostById = (postId: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_POST_BY_ID, postId],
+    queryFn: () => getPostById({ postId })
+  });
+}
 
 /** useMutation */
 
@@ -341,6 +354,32 @@ export const useUnfollowUserMutation = () => {
   };
 } 
 
+export const useToggleLikePostMutation = () => {
+  const queryClient = useQueryClient();
+  const [toggleLikePostMutation] = useMutation(TOGGLE_LIKE_POST, {
+    onCompleted: (data) => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_POST_BY_ID, data.toggleLikePost._id] });
+    },
+    onError: () => {
+      toast.error('Cannot perform like action. Please try again.');
+    }
+  });
+  
+  return {
+    toggleLikePost: (id: string) => toggleLikePostMutation({ variables: { id } }),
+  };
+}
 
+export const useToggleSavePostMutation = () => {
+  const queryClient = useQueryClient();
+  const [toggleSavePostMutation] = useMutation(TOGGLE_SAVE_POST, {
+    onCompleted: (data) => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_POST_BY_ID, data.toggleSavePost._id] });
+    },
+  });
+  return {
+    toggleSavePost: (id: string) => toggleSavePostMutation({ variables: { id } }),
+  };
+} 
 
 
