@@ -19,8 +19,6 @@ const PostStats = ({ post }: PostStatsProps) => {
   const [likes, setLikes] = useState<string[]>(likesList || []);
   const [saves, setSaves] = useState<string[]>(savedList || []);
 
-  console.log(post);
-
   
   const { toggleLikePost } = useToggleLikePostMutation();
   const { toggleSavePost } = useToggleSavePostMutation();

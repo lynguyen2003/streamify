@@ -91,7 +91,7 @@ const LeftSidebar = () => {
           <p className="base-medium lg:base-medium">Logout</p>
         </Button>
         <Button variant="ghost" className="shad-button_ghost">
-          <img src="/assets/images/setting.png" alt="setting" />
+          <img src="/assets/icons/setting.png" alt="setting" />
           <p className="base-medium lg:base-medium">Setting</p>
         </Button>
       </div>
