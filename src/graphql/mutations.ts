@@ -9,14 +9,68 @@ import { gql } from "@apollo/client";
 export const UPDATE_USER = gql`
   mutation UpdateUser($input: UpdateUserInput!) {
     updateUser(input: $input) {
-        _id
-        bio
-        email
-        imageUrl
-        phone
-        username
+      _id
+      username
+      email
+      phone
+      bio
+      imageUrl
     }
-}
+  }
+`;
+
+/**
+ * Mutation to create a post
+ * @param {string} input - The input to create the post
+ * @returns {Promise<Post>} - A promise that resolves to the created post
+ */
+
+export const CREATE_POST = gql`
+  mutation AddPost($input: AddPostInput!) {
+    addPost(input: $input) {
+      _id
+      caption
+      mediaUrls
+      tags
+      location
+      type
+      privacy
+      mentions {
+        _id
+        username
+      }
+      createdAt
+      author {
+        _id
+        username
+        imageUrl
+      }
+    }
+  }
+`;
+
+export const TOGGLE_LIKE_POST = gql`
+  mutation ToggleLikePost($id: String!) {
+    toggleLikePost(id: $id) {
+      _id
+      likeCount
+      likes {
+        _id
+      }
+    }
+  }
+`;
+
+export const TOGGLE_SAVE_POST = gql`
+  mutation ToggleSavePost($id: String!) {
+    toggleSavePost(id: $id) {
+      _id
+      saveCount
+      saves {
+        _id
+      }
+    }
+  }
 `;
 
 /**
@@ -110,7 +164,21 @@ export const UNBLOCK_USER = gql`
 
 export const FOLLOW_USER = gql`
   mutation FollowUser($userId: String!) {
-    follow(userId: $userId)
+    followUser(userId: $userId) {
+      _id
+      followers {
+        _id
+        username
+        imageUrl
+      }
+      following {
+        _id
+        username
+        imageUrl
+      }
+      followersCount
+      followingCount
+    }
   }
 `;
 
@@ -120,29 +188,32 @@ export const UNFOLLOW_USER = gql`
   }
 `;
 
-export const TOGGLE_LIKE_POST = gql`
-  mutation ToggleLikePost($id: String!) {
-    toggleLikePost(id: $id) {
+// ========== COMMENTS ==========
+
+export const ADD_COMMENT = gql`
+  mutation AddComment($input: AddCommentInput!) {
+    addComment(input: $input) {
       _id
-      likes {
+      text
+      author {
         _id
+        username
+        imageUrl
       }
-      likeCount
+      createdAt
     }
   }
 `;
 
-export const TOGGLE_SAVE_POST = gql`
-  mutation ToggleSavePost($id: String!) {
-    toggleSavePost(id: $id) {
+export const DELETE_COMMENT = gql`
+  mutation DeleteComment($id: String!) {
+    deleteComment(id: $id) {
       _id
-      saves {
-        _id
-      }
-      saveCount
     }
   }
 `;
+
+
 
 
 

@@ -8,7 +8,7 @@ import DefaultLayout from "@/layouts/DefaultLayout";
 import AuthLayout from "@/layouts/AuthLayout";
 import ForgotFwd from "@/pages/ForgotFwd";
 import LikedPosts from "@/components/shared/LikedPosts"; 
-import UpdateProfile from "@/pages/UpdateProfile";
+import UpdateProfile from "@/components/forms/UpdateProfile";
 
 interface RouteType {
     path: string;

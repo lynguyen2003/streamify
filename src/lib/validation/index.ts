@@ -41,13 +41,16 @@ export const PostValidation = z.object({
   caption: z
     .string()
     .min(5, { message: "Minimum 5 characters." })
-    .max(2200, { message: "Maximum 2,200 caracters" }),
-  file: z.custom<File[]>(),
+    .max(150, { message: "Maximum 150 characters" }),
+  mediaUrls: z.array(z.string()),
+  type: z.string(),
   location: z
     .string()
     .min(1, { message: "This field is required" })
     .max(1000, { message: "Maximum 1000 characters." }),
-  tags: z.string(),
+  tags: z.array(z.string()),
+  mentions: z.array(z.string()),
+  privacy: z.enum(["public", "private", "followers", "friends"]).default("public"),
 });
 
 export const ForgotPasswordValidation = z.object({

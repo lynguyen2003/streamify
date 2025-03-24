@@ -6,20 +6,22 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const convertFileToUrl = (file: File) => URL.createObjectURL(file);
+export function convertFileToUrl(file: File) {
+  return URL.createObjectURL(file);
+}
 
 
-export const checkIsLiked = (likeList: string[], userId: string) => {
+export function checkIsLiked(likeList: string[], userId: string) {
   if (!likeList) return false;
   return likeList.includes(userId);
 };
 
-export const checkIsSaved = (saveList: string[], userId: string) => {
+export function checkIsSaved(saveList: string[], userId: string) {
   if (!saveList) return false;
   return saveList.includes(userId);
 };
 
-export const apolloErrorHandler = (error: ApolloError) => {
+export function apolloErrorHandler(error: ApolloError) {
   const mainError = error.message;
   
   if (error.graphQLErrors && error.graphQLErrors.length > 0) {
@@ -167,3 +169,31 @@ function formatCustomDate(date: Date, format: string): string {
     .replace('mm', minutes)
     .replace('ss', seconds);
 }
+
+
+export async function uploadMedia(file: File): Promise<string> {
+  try {
+    // Create form data for file upload
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    // Get the file extension to determine post type
+    const fileType = file.type.startsWith('image/') ? 'post' : 'reel';
+    
+    // Send file to your API
+    const response = await fetch(`/api/upload/${fileType}`, {
+      method: 'POST',
+      body: formData,
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to upload media');
+    }
+    
+    const data = await response.json();
+    return data.mediaUrl;
+  } catch (error) {
+    console.error('Error uploading media:', error);
+    throw error;
+  }
+}; 

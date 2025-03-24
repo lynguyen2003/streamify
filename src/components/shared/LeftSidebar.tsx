@@ -137,7 +137,7 @@ const LeftSidebar = () => {
                       <img
                         src={link.imgURL}
                         alt={link.label}
-                        className={`group-hover:invert-white transition-transform duration-200 ${isCreateMenuOpen && "invert-white"}`}
+                        className={`group-hover:invert-white group-hover:scale-110 transition-transform duration-200 ${isCreateMenuOpen && "invert-white"}`}
                       />
                       {link.label}
                     </div>
@@ -153,7 +153,7 @@ const LeftSidebar = () => {
                           <div 
                             key={menuLink.label}
                             className="flex justify-between gap-4 items-center p-4 cursor-pointer
-                              transition-all duration-200 hover:scale-105 rounded-md group"
+                              transition-all duration-200 hover:scale-110 rounded-md group"
                             onClick={() => handleOptionClick(menuLink.label)}
                             onKeyDown={(e) => handleKeyDown(e, menuLink.label)}
                             tabIndex={0}
@@ -165,7 +165,7 @@ const LeftSidebar = () => {
                             <img
                               src={menuLink.imgURL}
                               alt={menuLink.label}
-                              className="transition-all duration-200 w-5 h-5 group-hover:scale-110"
+                              className="transition-all duration-200"
                             />
                           </div>
                         ))}
@@ -180,6 +180,8 @@ const LeftSidebar = () => {
                     <img
                       src={link.imgURL}
                       alt={link.label}
+                      width={24}
+                      height={24}
                       className={`group-hover:invert-white transition-transform duration-200 
                         group-hover:scale-110 ${isActive && "invert-white"}`}
                     />

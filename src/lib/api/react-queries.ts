@@ -5,10 +5,10 @@ import {
 } from '@tanstack/react-query';
 import { apolloClient } from '@/lib/api/apiSlice';
 import { GET_POSTS, GET_USER_BY_ID, GET_LIKED_POSTS, GET_USERS, GET_FRIENDSHIP_STATUS, IS_FOLLOWING, GET_POST_BY_ID } from '@/graphql/queries';
-import { ACCEPT_FRIEND_REQUEST, ADD_FRIEND, BLOCK_USER, CANCEL_FRIEND_REQUEST, FOLLOW_USER, REJECT_FRIEND_REQUEST, TOGGLE_LIKE_POST, TOGGLE_SAVE_POST, UNFOLLOW_USER, UNFRIEND, UPDATE_USER } from '@/graphql/mutations';
+import { ACCEPT_FRIEND_REQUEST, ADD_FRIEND, BLOCK_USER, CANCEL_FRIEND_REQUEST, CREATE_POST, FOLLOW_USER, REJECT_FRIEND_REQUEST, TOGGLE_LIKE_POST, TOGGLE_SAVE_POST, UNFOLLOW_USER, UNFRIEND, UPDATE_USER } from '@/graphql/mutations';
 import { useMutation } from '@apollo/client';
 import { toast } from 'sonner';
-import { IUpdateUser } from '@/types';
+import { ICreatePost, IUpdateUser } from '@/types';
 import { QUERY_KEYS } from './queriesKeys';
 // ========== POSTS ==========
 
@@ -382,4 +382,20 @@ export const useToggleSavePostMutation = () => {
   };
 } 
 
+export const useCreatePostMutation = () => {
+  const [createPostMutation, { loading, error }] = useMutation(CREATE_POST, {
+    onCompleted: () => {
+      toast.success('Post created successfully');
+    },
+    onError: () => {
+      toast.error('Failed to create post');
+    }
+  });
+
+  return {
+    createPost: (input: ICreatePost) => createPostMutation({ variables: { input } }),
+    loading,
+    error
+  };
+}
 

@@ -33,6 +33,18 @@ export type IPost = {
   createdAt: string;
 }
 
+export type ICreatePost = {
+  caption: string
+  mediaUrls: string[]
+  type: string
+  location: string
+  tags: string[]
+  mentions: string[]
+  privacy: string
+  audio: IAudio
+  duration: number
+}
+
 export type IUser = {
   _id: string;
   email: string;
