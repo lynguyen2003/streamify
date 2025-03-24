@@ -101,6 +101,19 @@ docker-compose up
 
 - `VITE_GRAPHQL_URL`: URL for the GraphQL API endpoint (default: http://localhost:4000/graphql)
 
+## New Dependencies
+
+This project requires the following additional dependencies:
+
+- `@radix-ui/react-dialog`: For creating accessible dialog components
+- `lucide-react`: For icons in the dialog components
+
+To install these dependencies, run:
+
+```bash
+npm install @radix-ui/react-dialog lucide-react
+```
+
 ## License
 
 ISC

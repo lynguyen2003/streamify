@@ -31,8 +31,31 @@ export const sidebarLinks = [
   },
   {
     imgURL: "/assets/icons/gallery-add.svg",
+    route: "/create",
+    label: "Create",
+  },
+];
+
+export const createMenuLinks = [
+  {
+    imgURL: "/assets/icons/gallery-add.svg",
     route: "/create-post",
-    label: "Create Post",
+    label: "Post",
+  },
+  {
+    imgURL: "/assets/icons/reels.png",
+    route: "/create-reel",
+    label: "Reel",
+  },
+  {
+    imgURL: "/assets/icons/stream.svg",
+    route: "/create-stream",
+    label: "Start Streaming",
+  },
+  {
+    imgURL: "/assets/icons/ai.svg",
+    route: "/ai-studio/create",
+    label: "AI",
   },
 ];
 

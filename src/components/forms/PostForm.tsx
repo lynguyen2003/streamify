@@ -24,7 +24,6 @@ type PostFormProps = {
 };
 
 const PostForm = ({ post, action }: PostFormProps) => {
-    const navigate = useNavigate();
     const form = useForm<z.infer<typeof PostValidation>>({
     resolver: zodResolver(PostValidation),
     defaultValues: {
@@ -34,10 +33,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
       tags: post ? post.tags.join(",") : "",
     },
   });
-
-  // Query
-
-  // Handler
+  
   const handleSubmit = async (value: z.infer<typeof PostValidation>) => {
     console.log(value);
   };
@@ -46,7 +42,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(handleSubmit)}
-        className="flex flex-col gap-9 w-full  max-w-5xl"
+        className="flex flex-col gap-4 w-full max-w-5xl p-2"
       >
         <FormField
           control={form.control}
@@ -117,14 +113,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
           )}
         />
 
-        <div className="flex gap-4 items-center justify-end">
-          <Button
-            type="button"
-            className="shad-button_dark_4"
-            onClick={() => navigate(-1)}
-          >
-            Cancel
-          </Button>
+        <div className="flex items-center justify-end">
           <Button
             type="submit"
             className="shad-button_primary whitespace-nowrap"
