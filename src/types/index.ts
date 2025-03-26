@@ -23,6 +23,7 @@ export type IPost = {
   likeCount: number;
   saveCount: number;
   commentCount: number;
+  comments?: IComment[];
   type: string;
   mentions: IUser[];
   privacy: string;
@@ -68,4 +69,16 @@ export type IUpdateUser = {
   phone: string;
   imageUrl: string;
   bio: string;
+}
+
+export type IComment = {
+  _id: string;
+  post: string;
+  author: IUser;
+  content: string;
+  parentComment?: string | null;
+  replies?: IComment[];
+  likes: string[];
+  createdAt: string;
+  updatedAt: string;
 }

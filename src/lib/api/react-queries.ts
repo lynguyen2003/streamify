@@ -73,6 +73,8 @@ async function getPostById({ postId }: { postId: string }) {
   });
   return data.post;
 }
+
+
 // =====================================
 // ========== USE REACT QUERY ==========
 // =====================================
@@ -133,7 +135,8 @@ export const useIsFollowing = (userId: string) => {
 export const useGetPostById = (postId: string) => {
   return useQuery({
     queryKey: [QUERY_KEYS.GET_POST_BY_ID, postId],
-    queryFn: () => getPostById({ postId })
+    queryFn: () => getPostById({ postId }),
+    enabled: !!postId
   });
 }
 

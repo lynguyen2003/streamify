@@ -3,6 +3,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogOverlay,
 } from "@/components/ui/dialog";
 import PostForm from "@/components/forms/PostForm";
 
@@ -14,7 +15,8 @@ type CreatePostDialogProps = {
 const CreatePostDialog = ({ isOpen, onOpenChange }: CreatePostDialogProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-dark-2 text-light-1 max-w-md lg:max-w-4xl border-dark-4">
+      <DialogOverlay className="bg-dark-2/30" />
+      <DialogContent className="bg-dark-2 p-6 text-light-1 max-w-md lg:max-w-5xl border-dark-4">
         <DialogHeader>
           <DialogTitle className="text-left text-2xl font-medium">Create Post</DialogTitle>
         </DialogHeader>

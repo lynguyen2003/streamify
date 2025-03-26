@@ -73,6 +73,14 @@ export const TOGGLE_SAVE_POST = gql`
   }
 `;
 
+export const DELETE_POST = gql`
+  mutation DeletePost($postId: String!) {
+    deletePost(postId: $postId) {
+      _id
+    }
+  }
+`;
+
 /**
  * Mutation to add a friend
  * @param {string} userId - The id of the user to add as a friend
@@ -191,23 +199,54 @@ export const UNFOLLOW_USER = gql`
 // ========== COMMENTS ==========
 
 export const ADD_COMMENT = gql`
-  mutation AddComment($input: AddCommentInput!) {
-    addComment(input: $input) {
+  mutation AddComment($postId: String!, $content: String!) {
+    addComment(postId: $postId, content: $content) {
       _id
-      text
+      post
+      content
       author {
         _id
         username
         imageUrl
       }
+      likes
       createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const REPLY_COMMENT = gql`
+  mutation ReplyComment($commentId: String!, $content: String!) {
+    replyComment(commentId: $commentId, content: $content) {
+      _id
+      post
+      content
+      parentComment
+      author {
+        _id
+        username
+        imageUrl
+      }
+      likes
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const LIKE_COMMENT = gql`
+  mutation LikeComment($commentId: String!) {
+    likeComment(commentId: $commentId) {
+      _id
+      likes
     }
   }
 `;
 
 export const DELETE_COMMENT = gql`
-  mutation DeleteComment($id: String!) {
-    deleteComment(id: $id) {
+  mutation DeleteComment($commentId: String!) {
+    deleteComment(commentId: $commentId) {
       _id
     }
   }

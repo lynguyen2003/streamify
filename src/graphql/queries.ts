@@ -58,15 +58,53 @@ export const GET_POSTS = gql`
 export const GET_POST_BY_ID = gql`
   query Post($postId: String!) {
     post(id: $postId) {
-      _id 
+      _id
+      audio {
+        artist
+        name
+        url
+      }
+      author {
+        _id
+        email
+        username
+        imageUrl
+      }
+      caption
+      commentCount
+      comments {
+        _id
+        content
+        author {
+          _id
+          username
+          imageUrl
+        }
+        likeCount
+        createdAt
+      }
+      duration
+      expiresAt
+      likeCount
       likes {
         _id
       }
-      saved {
+      location
+      mediaUrls
+      mentions {
+        _id
+        username
+      }
+      privacy
+      saveCount
+      saves {
         _id
       }
-      likeCount
-      saveCount
+      tags
+      type
+      viewCount
+      createdAt
+      updatedAt
     }
   }
 `;

@@ -130,22 +130,22 @@ function getRelativeTimeString(date: Date): string {
 
   switch (true) {
     case diffInSeconds < 60:
-      return "Just now";
+      return "now";
     case diffInMinutes < 60:
       const minutes = Math.floor(diffInMinutes);
-      return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'} ago`;
+      return `${minutes} ${minutes === 1 ? 'm' : 'm'}`;
     case diffInHours < 24:
       const hours = Math.floor(diffInHours);
-      return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
+      return `${hours} ${hours === 1 ? 'h' : 'h'}`;
     case diffInDays < 30:
       const days = Math.floor(diffInDays);
-      return `${days} ${days === 1 ? 'day' : 'days'} ago`;
+      return `${days} ${days === 1 ? 'd' : 'd'}`;
     case diffInMonths < 12:
       const months = Math.floor(diffInMonths);
-      return `${months} ${months === 1 ? 'month' : 'months'} ago`;
+      return `${months} ${months === 1 ? 'mo' : 'mo'}`;
     default:
       const years = Math.floor(diffInYears);
-      return `${years} ${years === 1 ? 'year' : 'years'} ago`;
+      return `${years} ${years === 1 ? 'y' : 'y'}`;
   }
 }
 

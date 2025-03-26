@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
 import { IPost } from "@/types";
+import { Link } from "react-router-dom";
 
 type GridPostListProps = {
   posts: IPost[];

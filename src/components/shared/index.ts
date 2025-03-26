@@ -10,3 +10,5 @@ export { default as ProfileUploader } from "./ProfileUploader";
 export { default as PostStats } from "./PostStats";
 export { default as PostComments } from "./PostComments";
 export { default as CreatePostDialog } from "./CreatePostDialog";
+export { default as PostDetailDialog } from "./PostDetailDialog";
+export { default as CommentCard } from "./CommentCard";

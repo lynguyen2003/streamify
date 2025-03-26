@@ -13,7 +13,7 @@ const Home = () => {
 
   const {
     data: postsData,
-    isPending: isPendingPost,
+    isLoading: isLoadingPost,
     fetchNextPage: fetchNextPagePost,
     hasNextPage: hasNextPagePost,
   } = useInfinitePosts();
@@ -90,7 +90,7 @@ const Home = () => {
           <div>
             <h2 className="h3-bold md:h2-bold text-left w-full">Home Feed</h2>
           </div>
-          {isPendingPost && !postsData ? (
+          {isLoadingPost && !postsData ? (
             <Loader />
           ) : (
             <ul className="flex flex-col flex-1 gap-9 w-full">

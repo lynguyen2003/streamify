@@ -147,7 +147,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(handleSubmit)}
-        className="flex flex-col lg:flex-row gap-2 justify-between p-1"
+        className="flex flex-col lg:flex-row gap-2 justify-between"
       >
         <div className="flex flex-col gap-2 w-full lg:w-2/3">
           <FormLabel className="shad-form_label">
