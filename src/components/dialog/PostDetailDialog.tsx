@@ -1,12 +1,13 @@
 import {
     Dialog,
+    DialogClose,
     DialogContent,
 } from "@/components/ui/dialog";
 import { useState, useEffect } from "react";
 import { formatTimestamp } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import { IPost } from "@/types";
-import { PostStats, PostComments, Loader, CommentCard } from ".";
+import { PostStats, PostComments, Loader, CommentCard } from "@/components/shared";
 import { useAppSelector } from "@/hooks/useAppSelector";
 import { RootState } from "@/store";
 import { Button } from "../ui";
@@ -39,12 +40,18 @@ const PostDetailDialog = ({ isOpen, onOpenChange, id }: PostDetailDialogProps) =
     return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
         <DialogTitle className="sr-only">Post Details</DialogTitle>
-        <DialogContent className="w-full max-w-md lg:max-w-5xl bg-dark-2 p-3 border-dark-4">
+        <DialogContent className="w-full h-full lg:h-auto max-w-md lg:max-w-5xl bg-dark-2 lg:p-3 border-dark-4">
         <div className="post_details-container">
             {isPending || !post ? (
                 <Loader />
             ) : (
-                <div className="post_details-card">
+                <div className="post_details-card relative">
+                    <DialogClose className="absolute top-2 right-2 flex px-2 py-2 lg:hidden justify-end bg-light-2 rounded-full focus:outline-none">
+                        <svg width="16" height="16" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M41.2861 6.71387L24.0001 23.9999L6.70605 41.2939" stroke="#000000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M41.298 41.298L6.70801 6.70801" stroke="#000000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </DialogClose>
                     <img
                         src="/assets/images/side-img.svg"
                         alt="creator"
@@ -123,7 +130,7 @@ const PostDetailDialog = ({ isOpen, onOpenChange, id }: PostDetailDialogProps) =
 
                         <hr className="border w-full border-dark-4/80" />
 
-                        <div className="w-full flex-1 ">
+                        <div className="w-full flex-1 bg-dark-3 rounded-lg">
                             <CommentCard post={post} />
                         </div>
 

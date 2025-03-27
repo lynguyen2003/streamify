@@ -2,9 +2,10 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { formatTimestamp } from "@/lib/utils";
 import { IPost } from "@/types";
-import { PostStats, PostComments, PostDetailDialog } from ".";
+import { PostStats, PostComments } from ".";
 import { useAppSelector } from "@/hooks/useAppSelector";
 import { RootState } from "@/store";
+import PostDetailDialog from "@/components/dialog/PostDetailDialog";
 
 type PostCardProps = {
   post: IPost;

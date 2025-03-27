@@ -9,7 +9,7 @@ import { toast } from "sonner"
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-import CreatePostDialog from "./CreatePostDialog";
+import CreatePostDialog from "@/components/dialog/CreatePostDialog";
 
 const LeftSidebar = () => {
   const navigate = useNavigate();

@@ -158,11 +158,11 @@
 
   /* Post Details */
   .post_details-container {
-    @apply flex flex-col flex-1 gap-10 overflow-scroll py-10 px-5 md:p-0 custom-scrollbar items-center;
+    @apply flex flex-col flex-1 gap-10 overflow-scroll lg:py-10 lg:px-5 md:p-0 custom-scrollbar items-center;
   }
 
   .post_details-card {
-    @apply bg-dark-2 w-full max-w-5xl flex-col flex lg:flex-row;
+    @apply bg-dark-2 w-full max-w-5xl flex-col flex lg:flex-row rounded-[24px];
   }
 
   .post_details-img {
@@ -170,7 +170,7 @@
   }
 
   .post_details-info {
-    @apply bg-dark-2 flex flex-col gap-5 lg:gap-4 flex-1 items-start px-6 py-5;
+    @apply bg-dark-2 flex flex-col gap-5 lg:gap-4 flex-1 items-start py-5 px-4 lg:px-6 lg:py-5;
   }
 
   .post_details-delete_btn {
