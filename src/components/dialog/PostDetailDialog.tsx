@@ -31,10 +31,10 @@ const PostDetailDialog = ({ isOpen, onOpenChange, id }: PostDetailDialogProps) =
         }
     }, [isOpen, data]);
 
-    const hasMultipleMedia = post?.mediaUrls && post?.mediaUrls.length > 1;
+    //const hasMultipleMedia = post?.mediaUrls && post?.mediaUrls.length > 1;
 
     const handleDeletePost = () => {
-        console.log("delete post");
+        
     }
 
     return (
@@ -130,7 +130,7 @@ const PostDetailDialog = ({ isOpen, onOpenChange, id }: PostDetailDialogProps) =
 
                         <hr className="border w-full border-dark-4/80" />
 
-                        <div className="w-full flex-1 bg-dark-3 rounded-lg">
+                        <div className="w-full flex-1 bg-dark-2 rounded-lg">
                             <CommentCard post={post} />
                         </div>
 

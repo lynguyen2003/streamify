@@ -1,11 +1,5 @@
 import { gql } from "@apollo/client";
 
-/**
- * Mutation to update a user
- * @param {string} input - The input to update the user
- * @returns {Promise<User>} - A promise that resolves to the updated user
- */
-
 export const UPDATE_USER = gql`
   mutation UpdateUser($input: UpdateUserInput!) {
     updateUser(input: $input) {
@@ -18,12 +12,6 @@ export const UPDATE_USER = gql`
     }
   }
 `;
-
-/**
- * Mutation to create a post
- * @param {string} input - The input to create the post
- * @returns {Promise<Post>} - A promise that resolves to the created post
- */
 
 export const CREATE_POST = gql`
   mutation AddPost($input: AddPostInput!) {
@@ -80,12 +68,6 @@ export const DELETE_POST = gql`
     }
   }
 `;
-
-/**
- * Mutation to add a friend
- * @param {string} userId - The id of the user to add as a friend
- * @returns {Promise<Friend>} - A promise that resolves to the added friend
- */
 
 export const ADD_FRIEND = gql`
   mutation AddFriend($userId: String!) {
@@ -252,6 +234,42 @@ export const DELETE_COMMENT = gql`
   }
 `;
 
+export const LOGIN_MUTATION = gql`
+  mutation Login($email: String!, $password: String!) {
+    authUser(email: $email, password: $password) {
+      accessToken
+      refreshToken
+    }
+  }
+`;
+
+export const REGISTER_MUTATION = gql`
+  mutation Register($email: String!, $password: String!) {
+    registerUser(email: $email, password: $password) {
+      token
+    }
+  }
+`;
+
+export const VERIFY_OTP = gql`
+  mutation VerifyOTP($email: String!, $token: String!) {
+    verifyOTP(email: $email, token: $token) {
+      token
+    }
+  }
+`;
+
+export const SEND_OTP_TO_EMAIL = gql`
+  mutation SendOTPToEmail($email: String!) {
+    sendOTPToEmail(email: $email)
+  }
+`;
+
+export const RESET_PASSWORD = gql`
+  mutation ResetPassword($email: String!, $token: String!, $newPassword: String!) {
+    resetPassword(email: $email, token: $token, newPassword: $newPassword)
+  }
+`;
 
 
 

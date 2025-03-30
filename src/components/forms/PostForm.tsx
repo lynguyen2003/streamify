@@ -1,9 +1,9 @@
 import * as z from "zod";
 import { useForm } from "react-hook-form";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@apollo/client";
+import { toast } from "sonner";
 
 import {
   Form,
@@ -24,9 +24,7 @@ import {
 import { PostValidation } from "@/lib/validation";
 import { FileUploader } from "@/components/shared";
 import { IPost, ICreatePost, IUser } from "@/types";
-import { CREATE_POST } from "@/graphql/mutations";
-import { toast } from "sonner";
-import { convertFileToUrl } from "@/lib/utils";
+import { useCreatePostMutation } from "@/lib/api/react-queries";
 
 type PostFormProps = {
   post?: IPost;
@@ -35,14 +33,9 @@ type PostFormProps = {
 
 const PostForm = ({ post, action }: PostFormProps) => {
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
-  const [files, setFiles] = useState<File[]>([]);
-  const [fileType, setFileType] = useState<"image" | "video" | null>(null);
-  const [mediaPreview, setMediaPreview] = useState<string[]>([]);
   
-  const [createPost] = useMutation(CREATE_POST);
+  const { createPost, loading } = useCreatePostMutation();
 
-  // Extract user IDs from IUser objects for mentions
   const extractUserIds = (users: IUser[] | undefined): string[] => {
     if (!users) return [];
     return users.map(user => user._id);
@@ -61,63 +54,21 @@ const PostForm = ({ post, action }: PostFormProps) => {
     },
   });
   
-  // Validate and set files
-  const handleFileChange = (uploadedFiles: File[]) => {
-    if (uploadedFiles.length === 0) {
-      setFiles([]);
-      setFileType(null);
-      setMediaPreview([]);
-      return;
-    }
-
-    const isVideo = uploadedFiles[0].type.startsWith('video/');
-    
-    if (isVideo) {
-      if (uploadedFiles.length > 1) {
-        toast.error("Only one video can be uploaded");
-        return;
-      }
-      setFileType("video");
-      setFiles([uploadedFiles[0]]);
-
-      const videoUrl = URL.createObjectURL(uploadedFiles[0]);
-      setMediaPreview([videoUrl]);
-    } else {
-      if (uploadedFiles.length > 10) {
-        toast.error("Maximum 10 images allowed");
-        return;
-      }
-      setFileType("image");
-      setFiles(uploadedFiles);
-    
-      const imageUrls = uploadedFiles.map(file => URL.createObjectURL(file));
-      setMediaPreview(imageUrls);
-    }
-  };
-  
-  useEffect(() => {
-    return () => {
-      mediaPreview.forEach(url => URL.revokeObjectURL(url));
-    };
-  }, [mediaPreview]);
-  
-  const handleSubmit = async (values: z.infer<typeof PostValidation>) => {
+  async function handleSubmit(values: z.infer<typeof PostValidation>) {
     try {
-      setIsLoading(true);      
-      if (files.length === 0) {
-        toast.error("Please upload at least one image or video");
-        setIsLoading(false);
+      if (!values.mediaUrls || values.mediaUrls.length === 0) {
+        toast.error("Please upload at least one media file");
         return;
       }
-      
-      // In production, you'd upload files to storage and get URLs
-      // For now, we'll use the local URLs for demonstration
-      const mediaUrls = files.map(file => convertFileToUrl(file));
-        
+      const hasVideo = values.mediaUrls.some(url => 
+        url.endsWith('.mp4') || url.endsWith('.mov') || url.endsWith('.webm')
+      );
+      const postType = hasVideo ? "reel" : "post";
+
       const postInput: ICreatePost = {
         caption: values.caption,
-        mediaUrls: mediaUrls,
-        type: "post",
+        mediaUrls: values.mediaUrls,
+        type: postType,
         location: values.location,
         tags: values.tags,
         mentions: values.mentions,
@@ -126,20 +77,14 @@ const PostForm = ({ post, action }: PostFormProps) => {
         duration: 0
       };
       
-      const { data } = await createPost({
-        variables: {
-          input: postInput
-        }
-      });
+      const { data } = await createPost(postInput);
       
       if (data?.addPost) {
         toast.success("Post created successfully");
-        navigate("/");
+        navigate(0);
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to create post");
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -150,44 +95,17 @@ const PostForm = ({ post, action }: PostFormProps) => {
         className="flex flex-col lg:flex-row gap-2 justify-between"
       >
         <div className="flex flex-col gap-2 w-full lg:w-2/3">
-          <FormLabel className="shad-form_label">
-            {fileType === "video" ? "Add Video" : "Add Photos (Max 10)"}
-          </FormLabel>
           
-          {/* File Uploader */}
-          <FileUploader
-            fieldChange={handleFileChange}
-            mediaUrl={mediaPreview[0] || ""}
-          />
-          
-          {/* Preview multiple images if uploaded more than one */}
-          {fileType === "image" && mediaPreview.length > 1 && (
-            <div className="grid grid-cols-3 gap-2">
-              {mediaPreview.slice(1).map((url, index) => (
-                <div 
-                  key={index} 
-                  className="aspect-square rounded-lg overflow-hidden bg-dark-4"
-                >
-                  <img 
-                    src={url} 
-                    alt={`preview-${index}`}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ))}
-            </div>
-          )}
-          
-          {/* Video preview if it's a video */}
-          {fileType === "video" && mediaPreview[0] && (
-            <div className="mt-3 w-full">
-              <video 
-                controls 
-                className="w-full rounded-lg"
-                src={mediaPreview[0]}
+          <FormField
+            control={form.control}
+            name="mediaUrls"
+            render={({ field }) => (
+              <FileUploader 
+                fieldChange={field.onChange} 
+                mediaUrl={field.value[0] || ""}
               />
-            </div>
-          )}
+            )}
+          />
         </div>
 
         <div className="flex flex-col gap-4 w-full lg:w-1/3">
@@ -347,15 +265,15 @@ const PostForm = ({ post, action }: PostFormProps) => {
             <Button
               type="submit"
               className="shad-button_primary whitespace-nowrap"
-              disabled={isLoading}
+              disabled={loading}
             >
-              {isLoading ? (
+              {loading ? (
                 <>
                   <div className="w-4 h-4 rounded-full border-2 border-t-transparent border-white animate-spin mr-2"></div>
                   {action === "Create" ? "Creating..." : "Updating..."}
                 </>
               ) : (
-                `${action} Post`
+                `${action}`
               )}
             </Button>
           </div>

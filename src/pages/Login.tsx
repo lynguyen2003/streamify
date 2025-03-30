@@ -34,15 +34,21 @@ const Login = () => {
   });
 
   const handleLogin = async (user: z.infer<typeof LoginSchema>) => {
-    setFormError(null);
-    await login(user.email, user.password);
-    if (error) {
+    try {
+      setFormError(null);
+      await login(user.email, user.password);
+      if (error) {
+        toast.error("Login failed", {
+          description: error,
+        });
+      } else {
+        toast("Welcome back!");
+        navigate("/");
+      }
+    } catch (error) {
       toast.error("Login failed", {
-        description: error,
+        description: "Invalid email or password",
       });
-    } else {
-      toast("Welcome back!");
-      navigate("/");
     }
   };
 

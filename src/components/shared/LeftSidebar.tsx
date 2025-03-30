@@ -91,14 +91,14 @@ const LeftSidebar = () => {
   return (
     <nav className="leftsidebar">
       <div className="flex flex-col gap-11">
-        <Link to="/" className="flex gap-3 items-center">
-          <img
-            src="/assets/images/logo.svg"
-            alt="logo"
-            width={170}
-            height={36}
-          />
-        </Link>
+        <img
+          src="/assets/images/logo.svg"
+          alt="logo"
+          width={170}
+          height={36}
+          onClick={() => navigate(0)}
+          className="  flex gap-3 items-center cursor-pointer"
+        />
 
         <Link to={`/profile/${user?._id}`} className="flex gap-3 items-center">
             <img

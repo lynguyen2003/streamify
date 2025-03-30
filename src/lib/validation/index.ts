@@ -55,6 +55,13 @@ export const PostValidation = z.object({
 
 export const ForgotPasswordValidation = z.object({
   email: z.string().email(),
+  otp: z.string().length(6, { message: "OTP must be 6 digits." }),
+  password: z
+    .string()
+    .min(8, { message: "Password must be at least 8 characters." }),
+  confirmPassword: z
+    .string()
+    .min(8, { message: "Password must be at least 8 characters." }),
 });
 
 export const ResetPasswordValidation = z.object({

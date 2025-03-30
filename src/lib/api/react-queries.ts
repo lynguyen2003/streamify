@@ -74,7 +74,6 @@ async function getPostById({ postId }: { postId: string }) {
   return data.post;
 }
 
-
 // =====================================
 // ========== USE REACT QUERY ==========
 // =====================================
@@ -401,4 +400,3 @@ export const useCreatePostMutation = () => {
     error
   };
 }
-

@@ -1,7 +1,5 @@
 import { gql } from '@apollo/client';
 
-// ========== POSTS ==========
-
 export const GET_POSTS = gql`
   query Posts($cursor: String, $limit: Int) {
   posts(cursor: $cursor, limit: $limit) {
@@ -52,8 +50,6 @@ export const GET_POSTS = gql`
   }
 }
 `;
-
-// ========== POST BY ID ==========
 
 export const GET_POST_BY_ID = gql`
   query Post($postId: String!) {
@@ -109,9 +105,6 @@ export const GET_POST_BY_ID = gql`
   }
 `;
 
-
-// ========== LIKED POSTS ==========
-
 export const GET_LIKED_POSTS = gql`
   query LikedPosts($userId: String!) {
   likedPosts(userId: $userId) {
@@ -142,8 +135,6 @@ export const GET_LIKED_POSTS = gql`
 } 
 `;
 
-// ========== USERS ==========
-
 export const GET_USERS = gql`
   query Users($cursor: String, $limit: Int) {
     users(cursor: $cursor, limit: $limit) {
@@ -164,8 +155,6 @@ export const GET_USERS = gql`
     }
   }
 `;
-
-// ========== USER BY ID ==========
 
 export const GET_USER_BY_ID = gql`
   query User($userId: String!) {
@@ -201,8 +190,6 @@ export const GET_USER_BY_ID = gql`
  }
 `;
 
-// ========== FRIEND REQUESTS ==========
-
 export const GET_FRIENDSHIP_STATUS = gql`
   query FriendshipStatus($userId: String!) {
     friendshipStatus(userId: $userId) {
@@ -219,10 +206,9 @@ export const GET_FRIENDSHIP_STATUS = gql`
 }
 `;
 
-// ========== FOLLOWING STATUS ==========
-
 export const IS_FOLLOWING = gql`
   query IsFollowing($userId: String!) {
     isFollowing(userId: $userId)
   }
 `;
+

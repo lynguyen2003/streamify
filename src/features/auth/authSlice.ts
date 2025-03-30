@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { gql } from '@apollo/client';
 import { apolloClient } from '@/lib/api/apiSlice';
 import { IUser } from '@/types';
+import { LOGIN_MUTATION, REGISTER_MUTATION, VERIFY_OTP, SEND_OTP_TO_EMAIL, RESET_PASSWORD } from '@/graphql/mutations';
+import { GET_USER_BY_ID } from '@/graphql/queries';
 
 type AuthState = {
   user: IUser | null;
@@ -16,63 +17,6 @@ const initialState: AuthState = {
   isLoading: false,
   error: null,
 };
-
-// GraphQL Mutations
-const LOGIN_MUTATION = gql`
-  mutation Login($email: String!, $password: String!) {
-    authUser(email: $email, password: $password) {
-      accessToken
-      refreshToken
-    }
-  }
-`;
-
-const REGISTER_MUTATION = gql`
-  mutation Register($email: String!, $password: String!) {
-    registerUser(email: $email, password: $password) {
-      token
-    }
-  }
-`;
-
-const VERIFY_OTP = gql`
-  mutation VerifyOTP($email: String!, $token: String!) {
-    verifyOTP(email: $email, token: $token) {
-      token
-    }
-  }
-`;
-
-// GraphQL Query
-const GET_USER_BY_ID = gql`
-  query User($userId: String!) {
-    user(id: $userId) {
-        _id
-        email
-        bio
-        username
-        phone
-        imageUrl
-        isActive
-        registrationDate
-        lastLogin
-        followersCount
-        followingCount
-        friendsCount
-        posts {
-            _id
-            mediaUrls
-            caption
-            tags
-            location
-            likeCount
-            type
-            duration
-            expiresAt
-        }
-    }
-}
-`;
 
 // Async Thunks
 export const loginUser = createAsyncThunk(
@@ -114,6 +58,39 @@ export const registerUser = createAsyncThunk(
     }
   }
 );
+
+export const sendOTPToEmail = createAsyncThunk(
+  'auth/sendOTPToEmail',
+  async (email: string) => {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: SEND_OTP_TO_EMAIL,
+        variables: { email },
+      });
+      return data.sendOTPToEmail;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+);
+
+export const resetPassword = createAsyncThunk(
+  'auth/resetPassword',
+  async (input: { email: string; token: string; newPassword: string }) => {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: RESET_PASSWORD,
+        variables: input,
+      });
+      return data.resetPassword;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+);
+
 
 export const verifyOTP = createAsyncThunk(
   'auth/verifyOTP',
@@ -210,6 +187,21 @@ const authSlice = createSlice({
       .addCase(getUserById.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.error.message || 'Get user by id failed';
+      });
+
+    // Send OTP To Email
+    builder
+      .addCase(sendOTPToEmail.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(sendOTPToEmail.fulfilled, (state) => {
+        state.isLoading = false;
+        state.error = null;
+      })
+      .addCase(sendOTPToEmail.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || 'Send OTP to email failed';
       });
   },
 });
