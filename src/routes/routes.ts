@@ -9,6 +9,7 @@ import AuthLayout from "@/layouts/AuthLayout";
 import ForgotFwd from "@/pages/ForgotFwd";
 import LikedPosts from "@/components/shared/LikedPosts"; 
 import UpdateProfile from "@/components/forms/UpdateProfile";
+import PostDetails from "@/components/shared/PostDetails";
 
 interface RouteType {
     path: string;
@@ -30,6 +31,7 @@ export const privateRoutes: PrivateRouteType[] = [
     { path: '/profile/:id/*', component: Profile, layout: DefaultLayout },
     { path: '/update-profile/:id', component: UpdateProfile, layout: DefaultLayout },
     { path: '/liked-posts/:id', component: LikedPosts, layout: DefaultLayout },
+    { path: '/posts/:id', component: PostDetails, layout: DefaultLayout },
 ]
 
 

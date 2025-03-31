@@ -166,7 +166,7 @@
   }
 
   .post_details-img {
-    @apply h-80 lg:h-[480px] lg:w-[48%] object-cover bg-dark-1;
+    @apply h-80 lg:h-[480px] lg:w-[48%] lg:rounded-[24px] object-scale-down bg-dark-1;
   }
 
   .post_details-info {

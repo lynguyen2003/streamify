@@ -62,10 +62,8 @@ export const TOGGLE_SAVE_POST = gql`
 `;
 
 export const DELETE_POST = gql`
-  mutation DeletePost($postId: String!) {
-    deletePost(postId: $postId) {
-      _id
-    }
+  mutation DeletePost($id: String!) {
+    deletePost(id: $id)
   }
 `;
 
@@ -154,21 +152,7 @@ export const UNBLOCK_USER = gql`
 
 export const FOLLOW_USER = gql`
   mutation FollowUser($userId: String!) {
-    followUser(userId: $userId) {
-      _id
-      followers {
-        _id
-        username
-        imageUrl
-      }
-      following {
-        _id
-        username
-        imageUrl
-      }
-      followersCount
-      followingCount
-    }
+    follow(userId: $userId)
   }
 `;
 
