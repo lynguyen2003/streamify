@@ -1,6 +1,6 @@
 import * as z from "zod";
 import { useForm } from "react-hook-form";
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -33,7 +33,8 @@ type PostFormProps = {
 
 const PostForm = ({ post, action }: PostFormProps) => {
   const navigate = useNavigate();
-  
+  const [ files, setFiles ] = useState<File[]>([]);
+
   const { createPost, loading } = useCreatePostMutation();
 
   const extractUserIds = (users: IUser[] | undefined): string[] => {
@@ -53,22 +54,55 @@ const PostForm = ({ post, action }: PostFormProps) => {
       privacy: post ? (post.privacy as "public" | "private" | "followers" | "friends") : "public",
     },
   });
-  
+
+  const handleFileChange = (selectedFiles: File[]) => {
+    setFiles(selectedFiles);
+  };
+
   async function handleSubmit(values: z.infer<typeof PostValidation>) {
     try {
-      if (!values.mediaUrls || values.mediaUrls.length === 0) {
-        toast.error("Please upload at least one media file");
+      if (files.length === 0) {
+        toast.error("Please select a file to upload");
         return;
       }
-      const hasVideo = values.mediaUrls.some(url => 
-        url.endsWith('.mp4') || url.endsWith('.mov') || url.endsWith('.webm')
-      );
-      const postType = hasVideo ? "reel" : "post";
+      
+      let baseUrl = import.meta.env.VITE_BASE_URL;
+      let uploadUrl = `${baseUrl}/api/${files.length === 1 ? 'upload' : 'upload-multiple'}`;
+
+      const mediaUrls = [];
+      
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const formData = new FormData();
+        formData.append("file", file);
+        
+        try {
+          const response = await fetch(uploadUrl, {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${localStorage.getItem("token")}`,
+            },
+            body: formData,
+          });
+          
+          if (!response.ok) {
+            throw new Error(`Upload failed with status ${response.status}`);
+          }
+          
+          const data = await response.json();
+          mediaUrls.push(data.mediaUrl);
+
+        } catch (error) {
+          console.error(`Error uploading file ${i + 1}:`, error);
+          toast.error(`Failed to upload file ${i + 1}`);
+          return;
+        }
+      }
 
       const postInput: ICreatePost = {
         caption: values.caption,
-        mediaUrls: values.mediaUrls,
-        type: postType,
+        mediaUrls: mediaUrls,
+        type: values.type,
         location: values.location,
         tags: values.tags,
         mentions: values.mentions,
@@ -84,7 +118,8 @@ const PostForm = ({ post, action }: PostFormProps) => {
         navigate(0);
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to create post");
+      console.error("Post submission error:", error);
+      toast.error("Failed to create post");
     }
   };
 
@@ -99,11 +134,13 @@ const PostForm = ({ post, action }: PostFormProps) => {
           <FormField
             control={form.control}
             name="mediaUrls"
-            render={({ field }) => (
-              <FileUploader 
-                fieldChange={field.onChange} 
-                mediaUrl={field.value[0] || ""}
-              />
+            render={() => (
+              <div className="flex flex-col gap-2 w-full">
+                <FileUploader 
+                  fieldChange={handleFileChange} 
+                  mediaUrl={post?.mediaUrls?.[0] || ""}
+                />
+              </div>
             )}
           />
         </div>

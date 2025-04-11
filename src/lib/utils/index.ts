@@ -173,25 +173,16 @@ function formatCustomDate(date: Date, format: string): string {
 
 export async function uploadMedia(file: File): Promise<string> {
   try {
-    // Create form data for file upload
-    const formData = new FormData();
-    formData.append('file', file);
+    // Import the uploadToCloudinary function dynamically to avoid circular dependencies
+    const { uploadToCloudinary } = await import('../api/cloudinaryApi');
     
-    // Get the file extension to determine post type
-    const fileType = file.type.startsWith('image/') ? 'post' : 'reel';
+    // Determine folder based on file type
+    const folder = file.type.startsWith('image/') ? 'images' : 'videos';
     
-    // Send file to your API
-    const response = await fetch(`/api/upload/${fileType}`, {
-      method: 'POST',
-      body: formData,
-    });
+    // Upload to Cloudinary and get the secure URL
+    const secureUrl = await uploadToCloudinary(file, folder);
     
-    if (!response.ok) {
-      throw new Error('Failed to upload media');
-    }
-    
-    const data = await response.json();
-    return data.mediaUrl;
+    return secureUrl;
   } catch (error) {
     console.error('Error uploading media:', error);
     throw error;
