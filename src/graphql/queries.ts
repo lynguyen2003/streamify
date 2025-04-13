@@ -212,3 +212,31 @@ export const IS_FOLLOWING = gql`
   }
 `;
 
+export const GET_COMMENTS = gql`
+  query Comments($postId: ID!) {
+    comments(postId: $postId) {
+      _id
+      content
+      author {
+        _id
+        username
+        imageUrl
+      }
+      likeCount
+      createdAt
+    }
+  }
+`;
+
+export const GET_REPLIES_COMMENT = gql`
+  query Comments($postId: ID!, $parentCommentId: ID,) {
+    comments(postId: $postId, parentCommentId: $parentCommentId) {
+      _id
+      author {
+        imageUrl
+        username
+      }
+      content
+    }
+  }
+`;

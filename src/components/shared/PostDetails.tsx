@@ -45,6 +45,11 @@ const PostDetails = () => {
     }
   };
 
+  const isVideoUrl = (url: string) => {
+    const videoExtensions = ['.mp4', '.webm', '.mov', '.avi', '.mkv', '.gif'];
+    return videoExtensions.some(ext => url.toLowerCase().includes(ext));
+  };
+
   if (isPending) {
     return (
       <div className="flex-center w-full h-full">
@@ -68,9 +73,11 @@ const PostDetails = () => {
 
   const isAuthor = authUser?.user?._id === data.author?._id;
   const hasMultipleMedia = data.mediaUrls && data.mediaUrls.length > 1;
+  const currentMediaUrl = data.mediaUrls[activeIndex] || "/assets/images/side-img.svg";
+  const isVideo = isVideoUrl(currentMediaUrl);
 
   return (
-    <div className="post_details-container">
+    <div className="post_details-container lg:py-10">
       <div className="hidden md:flex max-w-5xl w-full">
         <Button
           onClick={() => navigate(-1)}
@@ -91,11 +98,53 @@ const PostDetails = () => {
         <Loader />
       ) : (
         <div className="post_details-card">
-          <img
-            src={data.mediaUrls[activeIndex]}
-            alt="creator"
-            className="post_details-img"
-          />
+          <div className="relative lg:w-[48%]">
+            {isVideo ? (
+              <video 
+                src={currentMediaUrl} 
+                className="post_details-img" 
+                controls
+                autoPlay={true}
+                muted={true}
+                loop={true}
+                playsInline={true}
+              />
+            ) : (
+              <img
+                src={currentMediaUrl}
+                alt="post media"
+                className="post_details-img"
+              />
+            )}
+            
+            {hasMultipleMedia && (
+              <>
+                <button 
+                  onClick={handlePrevSlide}
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-dark-4/60 p-2 rounded-full z-10"
+                >
+                  <img src="/assets/icons/arrow-left.svg" alt="Previous" width={24} height={24} />
+                </button>
+                
+                <button 
+                  onClick={handleNextSlide}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-dark-4/60 p-2 rounded-full z-10"
+                >
+                  <img src="/assets/icons/arrow-right.svg" alt="Next" width={24} height={24} />
+                </button>
+                
+                <div className={`absolute ${isVideo ? 'bottom-16' : 'bottom-4'} left-0 right-0 flex justify-center gap-1 z-10`}>
+                  {data.mediaUrls.map((_: string, idx: number) => (
+                    <div 
+                      key={idx} 
+                      className={`w-3 h-3 rounded-full ${activeIndex === idx ? 'bg-primary-500' : 'bg-dark-4/60'}`}
+                      onClick={() => setActiveIndex(idx)}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
 
           <div className="post_details-info">
             <div className="flex-between w-full">
@@ -143,7 +192,7 @@ const PostDetails = () => {
                 <Button
                   onClick={handleDeletePost}
                   variant="ghost"
-                  className={`ost_details-delete_btn ${
+                  className={`post_details-delete_btn ${
                     authUser?.user?._id !== data.author._id && "hidden"
                   }`}
                 >
@@ -162,7 +211,7 @@ const PostDetails = () => {
             <div className="flex flex-col flex-1 w-full small-medium lg:base-regular">
               <p>{data.caption}</p>
               <ul className="flex gap-1 mt-2">
-                {data?.tags.map((tag: string, index: string) => (
+                {data?.tags.map((tag: string, index: number) => (
                   <li
                     key={`${tag}${index}`}
                     className="text-light-3 small-regular"

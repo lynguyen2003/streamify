@@ -13,9 +13,32 @@ type PostCardProps = {
 
 const PostCard = ({ post }: PostCardProps) => {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
   const authUser = useAppSelector((state: RootState) => state.auth);
   
   if (!post.author) return null;
+
+  const hasMultipleMedia = post.mediaUrls.length > 1;
+
+  const handleNextSlide = () => {
+    if (post.mediaUrls) {
+      setActiveIndex((prev) => (prev === post.mediaUrls.length - 1 ? 0 : prev + 1));
+    }
+  };
+
+  const handlePrevSlide = () => {
+    if (post.mediaUrls) {
+      setActiveIndex((prev) => (prev === 0 ? post.mediaUrls.length - 1 : prev - 1));
+    }
+  };
+
+  const isVideoUrl = (url: string) => {
+    const videoExtensions = ['.mp4', '.webm', '.mov', '.avi', '.mkv', '.gif'];
+    return videoExtensions.some(ext => url.toLowerCase().includes(ext));
+  };
+
+  const currentMediaUrl = post.mediaUrls[activeIndex] || "/assets/images/side-img.svg";
+  const isVideo = isVideoUrl(currentMediaUrl);
 
   return (
     <>
@@ -73,11 +96,55 @@ const PostCard = ({ post }: PostCardProps) => {
               ))}
             </ul>
 
-            <img
-              src={post.mediaUrls[0] || "/assets/images/side-img.svg"}
-              alt="post image"
-              className="post-card_img"
-            />
+            <div className="relative">
+              <div className="w-full relative">
+                {isVideo ? (
+                  <video 
+                    src={currentMediaUrl} 
+                    className="post-card_img" 
+                    controls
+                    autoPlay={true}
+                    muted={true}
+                    loop={true}
+                    playsInline={true}
+                  />
+                ) : (
+                  <img
+                    src={currentMediaUrl}
+                    alt="post media"
+                    className="post-card_img"
+                  />
+                )}
+                
+                {hasMultipleMedia && (
+                  <>
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); handlePrevSlide(); }}
+                      className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-dark-4/60 p-2 rounded-full z-10"
+                    >
+                      <img src="/assets/icons/arrow-left.svg" alt="Previous" width={20} height={20} />
+                    </button>
+                    
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); handleNextSlide(); }}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-dark-4/60 p-2 rounded-full z-10"
+                    >
+                      <img src="/assets/icons/arrow-right.svg" alt="Next" width={20} height={20} />
+                    </button>
+                    
+                    <div className={`absolute ${isVideo ? 'bottom-14' : 'bottom-2'} left-0 right-0 flex justify-center gap-1 z-10`}>
+                      {post.mediaUrls.map((_, idx) => (
+                        <div 
+                          key={idx} 
+                          className={`w-2 h-2 rounded-full ${activeIndex === idx ? 'bg-primary-500' : 'bg-dark-4/60'}`}
+                          onClick={(e) => { e.stopPropagation(); setActiveIndex(idx); }}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
           </div> 
 
           <div className="flex flex-col gap-8">

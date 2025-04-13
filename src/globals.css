@@ -158,15 +158,15 @@
 
   /* Post Details */
   .post_details-container {
-    @apply flex flex-col flex-1 gap-10 overflow-scroll lg:py-10 lg:px-5 md:p-0 custom-scrollbar items-center;
+    @apply flex flex-col flex-1 gap-2 overflow-scroll md:p-0 custom-scrollbar items-center;
   }
 
   .post_details-card {
     @apply bg-dark-2 w-full max-w-5xl flex-col flex lg:flex-row rounded-[24px];
   }
 
-  .post_details-img {
-    @apply h-80 lg:h-[480px] lg:w-[48%] lg:rounded-[24px] object-scale-down bg-dark-1;
+  .post_details-media {
+    @apply h-80 lg:h-[740px] object-scale-down bg-dark-1;
   }
 
   .post_details-info {

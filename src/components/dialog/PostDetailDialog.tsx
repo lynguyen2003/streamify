@@ -24,19 +24,44 @@ type PostDetailDialogProps = {
   
 const PostDetailDialog = ({ isOpen, onOpenChange, id }: PostDetailDialogProps) => {
     const navigate = useNavigate();
-    const [ post, setPost ] = useState<IPost>();
+    const [post, setPost] = useState<IPost>();
+    const [activeIndex, setActiveIndex] = useState(0);
     const authUser = useAppSelector((state: RootState) => state.auth);
     const { data, isPending } = useGetPostById(id);
-    const { deletePost, loading: isDeleting, error: deleteError } = useDeletePostMutation();
+    const { deletePost, error: deleteError } = useDeletePostMutation();
     const isAuthor = authUser.user?._id === post?.author._id;
 
     useEffect(() => {
         if (isOpen && data) {
             setPost(data);
+            setActiveIndex(0); // Reset to first media when dialog opens
         }
     }, [isOpen, data]);
 
-    //const hasMultipleMedia = post?.mediaUrls && post?.mediaUrls.length > 1;
+    const hasMultipleMedia = post?.mediaUrls && post?.mediaUrls.length > 1;
+
+    const handleNextSlide = () => {
+        if (post?.mediaUrls) {
+            setActiveIndex((prev) => (prev === post.mediaUrls.length - 1 ? 0 : prev + 1));
+        }
+    };
+
+    const handlePrevSlide = () => {
+        if (post?.mediaUrls) {
+            setActiveIndex((prev) => (prev === 0 ? post.mediaUrls.length - 1 : prev - 1));
+        }
+    };
+
+    const isVideoUrl = (url: string) => {
+        const videoExtensions = ['.mp4', '.webm', '.mov', '.avi', '.mkv', '.gif'];
+        return videoExtensions.some(ext => url.toLowerCase().includes(ext));
+    };
+
+    const currentMediaUrl = post?.mediaUrls && post.mediaUrls.length > 0 
+        ? post.mediaUrls[activeIndex] 
+        : "/assets/images/side-img.svg";
+    
+    const isVideo = currentMediaUrl ? isVideoUrl(currentMediaUrl) : false;
 
     const handleDeletePost = async () => {
         try {
@@ -68,11 +93,54 @@ const PostDetailDialog = ({ isOpen, onOpenChange, id }: PostDetailDialogProps) =
                             <path d="M41.298 41.298L6.70801 6.70801" stroke="#000000" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
                     </DialogClose>
-                    <img
-                        src={post.mediaUrls[0] || "/assets/images/side-img.svg"}
-                        alt="creator"
-                        className="post_details-img"
-                    />
+                    
+                    <div className="relative lg:w-[48%]">
+                        {isVideo ? (
+                            <video 
+                                src={currentMediaUrl} 
+                                className="post_details-media mx-auto" 
+                                controls
+                                autoPlay={true}
+                                muted={true}
+                                loop={true}
+                                playsInline={true}
+                            />
+                        ) : (
+                            <img
+                                src={currentMediaUrl}
+                                alt="post media"
+                                className="post_details-media"
+                            />
+                        )}
+                        
+                        {hasMultipleMedia && (
+                            <>
+                                <button 
+                                    onClick={handlePrevSlide}
+                                    className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-dark-4/60 p-2 rounded-full z-10"
+                                >
+                                    <img src="/assets/icons/arrow-left.svg" alt="Previous" width={24} height={24} />
+                                </button>
+                                
+                                <button 
+                                    onClick={handleNextSlide}
+                                    className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-dark-4/60 p-2 rounded-full z-10"
+                                >
+                                    <img src="/assets/icons/arrow-right.svg" alt="Next" width={24} height={24} />
+                                </button>
+                                
+                                <div className={`absolute ${isVideo ? 'bottom-16' : 'bottom-4'} left-0 right-0 flex justify-center gap-1 z-10`}>
+                                    {post.mediaUrls.map((_, idx) => (
+                                        <div 
+                                            key={idx} 
+                                            className={`w-3 h-3 rounded-full ${activeIndex === idx ? 'bg-primary-500' : 'bg-dark-4/60'}`}
+                                            onClick={() => setActiveIndex(idx)}
+                                        />
+                                    ))}
+                                </div>
+                            </>
+                        )}
+                    </div>
 
                     <div className="post_details-info">
                         <div className="flex-between w-full">
@@ -177,13 +245,13 @@ const PostDetailDialog = ({ isOpen, onOpenChange, id }: PostDetailDialogProps) =
             <div className="w-full max-w-5xl">
                 <hr className="border w-full border-dark-4/80" />
 
-                <h3 className="body-bold md:h3-bold w-full my-10">
+                <h3 className="body-bold md:h3-bold w-full my-5">
                     More Related Posts
                 </h3>
                 {isPending || !post ? (
                     <Loader />
                 ) : (
-                    <p>No related posts</p>
+                    <p className="text-light-3 small-regular my-5">No related posts</p>
                 )}
             </div>
         </div>
