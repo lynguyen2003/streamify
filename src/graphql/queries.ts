@@ -250,3 +250,37 @@ export const GET_REPLIES_COMMENT = gql`
     }
   }
 `;
+
+export const SEARCH_POSTS = gql`
+  query SearchPosts($searchQuery: String!) {
+    searchPosts(searchQuery: $searchQuery) {
+      _id
+      audio {
+        artist
+        name
+        url
+      }
+      author {
+        _id
+        email
+        username
+        imageUrl
+      }
+      caption
+      commentCount
+      likeCount
+      location
+      mediaUrls
+      mentions {
+        _id
+        username
+      }
+      saveCount
+      tags
+      type
+      viewCount
+      createdAt
+      updatedAt
+    }
+  }
+`;
