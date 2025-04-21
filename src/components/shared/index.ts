@@ -8,5 +8,5 @@ export { default as UserCard } from "./UserCard";
 export { default as FileUploader } from "./FileUploader";
 export { default as ProfileUploader } from "./ProfileUploader";
 export { default as PostStats } from "./PostStats";
-export { default as PostComments } from "./PostComments";
+export { default as CommentInput } from "./CommentInput";
 export { default as CommentCard } from "./CommentCard";

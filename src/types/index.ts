@@ -78,7 +78,14 @@ export type IComment = {
   content: string;
   parentComment?: string | null;
   replies?: IComment[];
-  likes: string[];
+  likes: IUser[];
   createdAt: string;
   updatedAt: string;
+}
+
+export type ICommentInput = {
+  content: string;
+  mentions: string[];
+  parentCommentId?: string | null;
+  postId: string;
 }

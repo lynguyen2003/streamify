@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { formatTimestamp } from "@/lib/utils";
 import { IPost } from "@/types";
-import { PostStats, PostComments } from ".";
+import { PostStats, CommentInput } from ".";
 import { useAppSelector } from "@/hooks/useAppSelector";
 import { RootState } from "@/store";
 import PostDetailDialog from "@/components/dialog/PostDetailDialog";
@@ -62,7 +62,7 @@ const PostCard = ({ post }: PostCardProps) => {
               </p>
               <div className="flex-start gap-2 text-light-3">
                 <p className="subtle-semibold lg:small-regular ">
-                  {formatTimestamp(parseInt(post.createdAt), 'date')}
+                  {formatTimestamp(parseInt(post.createdAt), 'auto')}
                 </p>
                 •
                 <p className="subtle-semibold lg:small-regular">
@@ -149,7 +149,7 @@ const PostCard = ({ post }: PostCardProps) => {
 
           <div className="flex flex-col gap-8">
             <PostStats post={post} />
-            <PostComments post={post} onCommentSubmit={() => Promise.resolve()} /> 
+            <CommentInput post={post} onCommentSubmit={() => Promise.resolve()} /> 
           </div>
         </div>
       </div>

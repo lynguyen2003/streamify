@@ -53,7 +53,7 @@ export function apolloErrorHandler(error: ApolloError) {
  */
 export function formatTimestamp(
   timestamp: string | number | Date, 
-  format: 'full' | 'date' | 'time' | 'dateTime' | 'relative' | string = 'dateTime',
+  format: 'full' | 'date' | 'time' | 'dateTime' | 'relative' | 'auto' | string = 'dateTime',
   locale: string = 'en-US'
 ): string {
   const date = timestamp instanceof Date 
@@ -63,6 +63,22 @@ export function formatTimestamp(
   // Check if date is valid
   if (isNaN(date.getTime())) {
     return 'Invalid date';
+  }
+
+  // For auto format, determine the format based on time elapsed
+  if (format === 'auto') {
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const diffInHours = diff / (1000 * 60 * 60);
+    const diffInDays = diffInHours / 24;
+
+    if (diffInHours < 24) {
+      format = 'relative';
+    } else if (diffInDays > 3) {
+      format = 'dateTime';
+    } else {
+      format = 'relative';
+    }
   }
 
   // Handle predefined formats
@@ -169,22 +185,3 @@ function formatCustomDate(date: Date, format: string): string {
     .replace('mm', minutes)
     .replace('ss', seconds);
 }
-
-
-export async function uploadMedia(file: File): Promise<string> {
-  try {
-    // Import the uploadToCloudinary function dynamically to avoid circular dependencies
-    const { uploadToCloudinary } = await import('../api/cloudinaryApi');
-    
-    // Determine folder based on file type
-    const folder = file.type.startsWith('image/') ? 'images' : 'videos';
-    
-    // Upload to Cloudinary and get the secure URL
-    const secureUrl = await uploadToCloudinary(file, folder);
-    
-    return secureUrl;
-  } catch (error) {
-    console.error('Error uploading media:', error);
-    throw error;
-  }
-}; 

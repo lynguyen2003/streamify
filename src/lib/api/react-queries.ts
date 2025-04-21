@@ -4,11 +4,11 @@ import {
   useQueryClient
 } from '@tanstack/react-query';
 import { apolloClient } from '@/lib/api/apiSlice';
-import { GET_POSTS, GET_USER_BY_ID, GET_LIKED_POSTS, GET_USERS, GET_FRIENDSHIP_STATUS, IS_FOLLOWING, GET_POST_BY_ID } from '@/graphql/queries';
-import { ACCEPT_FRIEND_REQUEST, ADD_FRIEND, BLOCK_USER, CANCEL_FRIEND_REQUEST, CREATE_POST, DELETE_POST, FOLLOW_USER, REJECT_FRIEND_REQUEST, TOGGLE_LIKE_POST, TOGGLE_SAVE_POST, UNFOLLOW_USER, UNFRIEND, UPDATE_USER } from '@/graphql/mutations';
+import { GET_POSTS, GET_USER_BY_ID, GET_LIKED_POSTS, GET_USERS, GET_FRIENDSHIP_STATUS, IS_FOLLOWING, GET_POST_BY_ID, GET_COMMENTS, GET_REPLIES_COMMENT } from '@/graphql/queries';
+import { ACCEPT_FRIEND_REQUEST, ADD_COMMENT, ADD_FRIEND, BLOCK_USER, CANCEL_FRIEND_REQUEST, CREATE_POST, DELETE_COMMENT, DELETE_POST, FOLLOW_USER, LIKE_COMMENT, REJECT_FRIEND_REQUEST, REPLY_COMMENT, TOGGLE_LIKE_POST, TOGGLE_SAVE_POST, UNFOLLOW_USER, UNFRIEND, UPDATE_USER } from '@/graphql/mutations';
 import { useMutation } from '@apollo/client';
 import { toast } from 'sonner';
-import { ICreatePost, IUpdateUser } from '@/types';
+import { IComment, ICommentInput, ICreatePost, IUpdateUser } from '@/types';
 import { QUERY_KEYS } from './queriesKeys';
 // ========== POSTS ==========
 
@@ -72,6 +72,22 @@ async function getPostById({ postId }: { postId: string }) {
     variables: { postId }
   });
   return data.post;
+}
+
+async function getComments({ postId }: { postId: string }) {
+  const { data } = await apolloClient.query({
+    query: GET_COMMENTS,
+    variables: { postId }
+  });
+  return data.comments;
+}
+
+async function getReplies({ postId, parentCommentId }: { postId: string, parentCommentId: string }) {
+  const { data } = await apolloClient.query({
+    query: GET_REPLIES_COMMENT,
+    variables: { postId, parentCommentId }
+  });
+  return data.comments;
 }
 
 // =====================================
@@ -138,6 +154,22 @@ export const useGetPostById = (postId: string) => {
     enabled: !!postId
   });
 }
+
+export const useGetComments = (postId: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_COMMENTS, postId],
+    queryFn: () => getComments({ postId }),
+    enabled: !!postId
+  });
+}
+
+export const useGetReplies = (postId: string, parentCommentId: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_REPLIES_COMMENT, postId, parentCommentId],
+    queryFn: () => getReplies({ postId, parentCommentId }),
+    enabled: !!postId && !!parentCommentId
+  });
+} 
 
 /** useMutation */
 
@@ -417,3 +449,59 @@ export const useDeletePostMutation = () => {
     error
   };
 }
+
+export const useAddCommentMutation = () => {
+  const [addCommentMutation, { loading, error }] = useMutation(ADD_COMMENT, {
+    onError: () => {
+      toast.error('Failed to add comment');
+    }
+  });
+
+  return {
+    addComment: (input: ICommentInput) => addCommentMutation({ variables: { input } }),
+    loading,
+    error
+  };
+}
+
+export const useLikeCommentMutation = () => {
+  const [likeCommentMutation, { loading, error }] = useMutation(LIKE_COMMENT, {
+    onError: () => {
+      toast.error('Failed to like comment');
+    }
+  });
+
+  return {
+    likeComment: (toggleLikeCommentId: string) => likeCommentMutation({ variables: { toggleLikeCommentId } }),
+    loading,
+    error
+  };
+}
+
+export const useReplyCommentMutation = () => {
+  const [replyCommentMutation, { loading, error }] = useMutation(REPLY_COMMENT, {
+    onError: () => {
+      toast.error('Failed to reply to comment');
+    }
+  });
+
+  return {
+    replyComment: (input: ICommentInput) => replyCommentMutation({ variables: { input } }),
+    loading,
+    error
+  };
+}  
+
+export const useDeleteCommentMutation = () => {
+  const [deleteCommentMutation, { loading, error }] = useMutation(DELETE_COMMENT, {
+    onError: () => {
+      toast.error('Failed to delete comment');
+    }
+  });
+
+  return {
+    deleteComment: (commentId: string) => deleteCommentMutation({ variables: { commentId } }),
+    loading,
+    error
+  };
+} 

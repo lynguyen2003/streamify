@@ -165,54 +165,46 @@ export const UNFOLLOW_USER = gql`
 // ========== COMMENTS ==========
 
 export const ADD_COMMENT = gql`
-  mutation AddComment($postId: String!, $content: String!) {
-    addComment(postId: $postId, content: $content) {
+  mutation AddComment($input: CommentInput!) {
+    addComment(input: $input) {
       _id
-      post
       content
       author {
         _id
         username
         imageUrl
       }
-      likes
       createdAt
-      updatedAt
     }
   }
 `;
 
 export const REPLY_COMMENT = gql`
-  mutation ReplyComment($commentId: String!, $content: String!) {
-    replyComment(commentId: $commentId, content: $content) {
+  mutation AddComment($input: CommentInput!) {
+    addComment(input: $input) {
       _id
-      post
       content
-      parentComment
       author {
         _id
         username
         imageUrl
       }
-      likes
       createdAt
-      updatedAt
     }
   }
 `;
 
 export const LIKE_COMMENT = gql`
-  mutation LikeComment($commentId: String!) {
-    likeComment(commentId: $commentId) {
+  mutation ToggleLikeComment($toggleLikeCommentId: String!) {
+    toggleLikeComment(id: $toggleLikeCommentId) {
       _id
-      likes
     }
   }
 `;
 
 export const DELETE_COMMENT = gql`
   mutation DeleteComment($commentId: String!) {
-    deleteComment(commentId: $commentId) {
+    deleteComment(id: $commentId) {
       _id
     }
   }

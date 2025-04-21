@@ -222,7 +222,13 @@ export const GET_COMMENTS = gql`
         username
         imageUrl
       }
+      replies {
+        _id
+      }
       likeCount
+      likes {
+        _id
+      }
       createdAt
     }
   }
@@ -237,6 +243,10 @@ export const GET_REPLIES_COMMENT = gql`
         username
       }
       content
+      likeCount
+      likes {
+        _id
+      }
     }
   }
 `;

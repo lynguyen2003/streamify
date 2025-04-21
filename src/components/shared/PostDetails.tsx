@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";;
 import { toast } from "sonner";
 
 import { formatTimestamp } from "@/lib/utils";
-import { PostStats, PostComments, Loader } from "@/components/shared";
+import { PostStats, CommentInput, Loader } from "@/components/shared";
 import { Button } from "@/components/ui";
 import { useAppSelector } from "@/hooks/useAppSelector";
 import { RootState } from "@/store";

@@ -8,7 +8,7 @@ import { useState, useEffect } from "react";
 import { formatTimestamp } from "@/lib/utils";
 import { Link, useNavigate } from "react-router-dom";
 import { IPost } from "@/types";
-import { PostStats, PostComments, Loader, CommentCard } from "@/components/shared";
+import { PostStats, CommentInput, Loader, CommentCard } from "@/components/shared";
 import { useAppSelector } from "@/hooks/useAppSelector";
 import { RootState } from "@/store";
 import { Button } from "../ui";
@@ -161,7 +161,7 @@ const PostDetailDialog = ({ isOpen, onOpenChange, id }: PostDetailDialogProps) =
                                 </p>
                             <div className="flex-center gap-2 text-light-3">
                                 <p className="subtle-semibold lg:small-regular ">
-                                    {post?.createdAt ? formatTimestamp(parseInt(post.createdAt), 'dateTime') : ''}
+                                    {post?.createdAt ? formatTimestamp(parseInt(post.createdAt), 'auto') : ''}
                                 </p>
                                 •
                                 <p className="subtle-semibold lg:small-regular">
@@ -228,7 +228,7 @@ const PostDetailDialog = ({ isOpen, onOpenChange, id }: PostDetailDialogProps) =
                         <hr className="border w-full border-dark-4/80" />
 
                         <div className="w-full flex-1 bg-dark-2 rounded-lg">
-                            <CommentCard post={post} />
+                            <CommentCard post={post} currentUser={authUser.user || undefined} />
                         </div>
 
                         <div className="w-full">
@@ -236,7 +236,7 @@ const PostDetailDialog = ({ isOpen, onOpenChange, id }: PostDetailDialogProps) =
                         </div>
 
                         <div className="w-full">
-                            <PostComments post={post} />
+                            <CommentInput post={post} />
                         </div>
                     </div>
                 </div>

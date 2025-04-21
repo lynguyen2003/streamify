@@ -9,4 +9,6 @@ export enum QUERY_KEYS {
     GET_USER_LIKED_POSTS = 'getUserLikedPosts',
     IS_FOLLOWING = 'isFollowing',
     GET_POST_BY_ID = 'getPostById',
+    GET_COMMENTS = "getComments",
+    GET_REPLIES_COMMENT = "getRepliesComment",
 }
