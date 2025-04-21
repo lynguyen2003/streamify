@@ -239,6 +239,7 @@ export const GET_REPLIES_COMMENT = gql`
     comments(postId: $postId, parentCommentId: $parentCommentId) {
       _id
       author {
+        _id
         imageUrl
         username
       }
@@ -247,6 +248,7 @@ export const GET_REPLIES_COMMENT = gql`
       likes {
         _id
       }
+      createdAt
     }
   }
 `;

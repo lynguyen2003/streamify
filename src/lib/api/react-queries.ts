@@ -527,13 +527,31 @@ export const useDeletePostMutation = () => {
 
 export const useAddCommentMutation = () => {
   const [addCommentMutation, { loading, error }] = useMutation(ADD_COMMENT, {
-    onError: () => {
+    onError: (error) => {
+      console.error('Comment error:', error);
       toast.error('Failed to add comment');
     }
   });
 
   return {
-    addComment: (input: ICommentInput) => addCommentMutation({ variables: { input } }),
+    addComment: async (input: ICommentInput) => {
+      try {
+        const mentionRegex = /@(\w+)/g;
+        const mentionsFound = input.content.match(mentionRegex) || [];
+      
+        return await addCommentMutation({ 
+          variables: { 
+            input: {
+              ...input,
+              mentions: []
+            } 
+          } 
+        });
+      } catch (err) {
+        console.error('Error in addComment:', err);
+        throw err;
+      }
+    },
     loading,
     error
   };
@@ -555,13 +573,30 @@ export const useLikeCommentMutation = () => {
 
 export const useReplyCommentMutation = () => {
   const [replyCommentMutation, { loading, error }] = useMutation(REPLY_COMMENT, {
-    onError: () => {
+    onError: (error) => {
+      console.error('Reply error:', error);
       toast.error('Failed to reply to comment');
     }
   });
 
   return {
-    replyComment: (input: ICommentInput) => replyCommentMutation({ variables: { input } }),
+    replyComment: async (input: ICommentInput) => {
+      try {
+        // Send the comment content as is, but don't extract mentions here
+        // The server will handle mention extraction from the content
+        return await replyCommentMutation({ 
+          variables: { 
+            input: {
+              ...input,
+              mentions: [] // Send empty array - server will extract mentions
+            } 
+          } 
+        });
+      } catch (err) {
+        console.error('Error in replyComment:', err);
+        throw err;
+      }
+    },
     loading,
     error
   };

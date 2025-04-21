@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppSelector } from '@/hooks/useAppSelector';
 import { RootState } from '@/store';
 import { IPost } from '@/types';
@@ -8,14 +8,28 @@ import { useAddCommentMutation } from '@/lib/api/react-queries';
 type CommentInputProps = {
   post: IPost;
   onCommentSubmit?: (comment: string) => Promise<void>;
+  replyToUsername?: string;
+  replyToCommentId?: string;
+  onCancelReply?: () => void;
 };
 
-const CommentInput = ({ post, onCommentSubmit }: CommentInputProps) => {
+const CommentInput = ({ 
+  post, 
+  onCommentSubmit, 
+  replyToUsername, 
+  replyToCommentId, 
+  onCancelReply 
+}: CommentInputProps) => {
   const [comment, setComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const authUser = useAppSelector((state: RootState) => state.auth);
   const { addComment } = useAddCommentMutation();
 
+  useEffect(() => {
+    if (replyToUsername) {
+      setComment(`@${replyToUsername} `);
+    }
+  }, [replyToUsername]);
 
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,7 +42,7 @@ const CommentInput = ({ post, onCommentSubmit }: CommentInputProps) => {
         postId: post._id,
         content: comment,
         mentions: [],
-        parentCommentId: null
+        parentCommentId: replyToCommentId || null
       });
 
       if (onCommentSubmit) {
@@ -36,6 +50,10 @@ const CommentInput = ({ post, onCommentSubmit }: CommentInputProps) => {
       }
 
       setComment('');
+      
+      if (onCancelReply) {
+        onCancelReply();
+      }
     } catch (error) {
       console.error('Failed to post comment:', error);
       toast.error('Failed to post comment. Please try again.');
@@ -44,11 +62,16 @@ const CommentInput = ({ post, onCommentSubmit }: CommentInputProps) => {
     }
   };
 
+  const handleCancelReply = () => {
+    setComment('');
+    if (onCancelReply) {
+      onCancelReply();
+    }
+  };
+
   return (
     <div className="post-comments">
-      {/* Comment Form */}
       <form onSubmit={handleSubmitComment} className="flex items-center gap-2 p-2 rounded-lg">
-        {/* User Avatar */}
         <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
           <img
             src={authUser?.user?.imageUrl || '/assets/icons/profile-placeholder.svg'}
@@ -59,14 +82,14 @@ const CommentInput = ({ post, onCommentSubmit }: CommentInputProps) => {
           />
         </div>
         
-        {/* Comment Input */}
         <div className="flex-grow relative">
           <input
             type="text"
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            placeholder="Write your comment..."
+            placeholder={replyToUsername ? `Reply to @${replyToUsername}...` : "Write your comment..."}
             className="w-full bg-dark-3 border-light-4 placeholder:text-light-4 text-light-2 rounded-lg py-2 px-4 focus:outline-none"
+            autoFocus={!!replyToUsername}
           />
           <button
             type="submit"
@@ -83,6 +106,15 @@ const CommentInput = ({ post, onCommentSubmit }: CommentInputProps) => {
             </svg>
           </button>
         </div>
+
+        {replyToUsername && (
+          <button
+            type="button"
+            onClick={handleCancelReply}
+            className="text-light-3 hover:text-light-1 text-sm">
+            Cancel
+          </button>
+        )}
       </form>
     </div>
   );

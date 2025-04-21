@@ -26,6 +26,8 @@ const PostDetailDialog = ({ isOpen, onOpenChange, id }: PostDetailDialogProps) =
     const navigate = useNavigate();
     const [post, setPost] = useState<IPost>();
     const [activeIndex, setActiveIndex] = useState(0);
+    const [replyToUsername, setReplyToUsername] = useState<string>("");
+    const [replyToCommentId, setReplyToCommentId] = useState<string>("");
     const authUser = useAppSelector((state: RootState) => state.auth);
     const { data, isPending } = useGetPostById(id);
     const { deletePost, error: deleteError } = useDeletePostMutation();
@@ -34,7 +36,9 @@ const PostDetailDialog = ({ isOpen, onOpenChange, id }: PostDetailDialogProps) =
     useEffect(() => {
         if (isOpen && data) {
             setPost(data);
-            setActiveIndex(0); // Reset to first media when dialog opens
+            setActiveIndex(0);
+            setReplyToUsername("");
+            setReplyToCommentId("");
         }
     }, [isOpen, data]);
 
@@ -77,6 +81,23 @@ const PostDetailDialog = ({ isOpen, onOpenChange, id }: PostDetailDialogProps) =
             console.error('Error deleting post:', error);
         }
     }
+
+    const handleReplyFocus = (username: string, commentId: string) => {
+        setReplyToUsername(username);
+        setReplyToCommentId(commentId);
+        setTimeout(() => {
+            const commentInput = document.querySelector('.post-comments input');
+            if (commentInput) {
+                commentInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                (commentInput as HTMLInputElement).focus();
+            }
+        }, 100);
+    };
+
+    const handleCancelReply = () => {
+        setReplyToUsername("");
+        setReplyToCommentId("");
+    };
 
     return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -228,7 +249,11 @@ const PostDetailDialog = ({ isOpen, onOpenChange, id }: PostDetailDialogProps) =
                         <hr className="border w-full border-dark-4/80" />
 
                         <div className="w-full flex-1 bg-dark-2 rounded-lg">
-                            <CommentCard post={post} currentUser={authUser.user || undefined} />
+                            <CommentCard 
+                                post={post} 
+                                currentUser={authUser.user || undefined} 
+                                onReplyFocus={handleReplyFocus}
+                            />
                         </div>
 
                         <div className="w-full">
@@ -236,7 +261,12 @@ const PostDetailDialog = ({ isOpen, onOpenChange, id }: PostDetailDialogProps) =
                         </div>
 
                         <div className="w-full">
-                            <CommentInput post={post} />
+                            <CommentInput 
+                                post={post} 
+                                replyToUsername={replyToUsername} 
+                                replyToCommentId={replyToCommentId}
+                                onCancelReply={handleCancelReply}
+                            />
                         </div>
                     </div>
                 </div>
