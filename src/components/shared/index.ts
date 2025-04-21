@@ -10,3 +10,11 @@ export { default as ProfileUploader } from "./ProfileUploader";
 export { default as PostStats } from "./PostStats";
 export { default as CommentInput } from "./CommentInput";
 export { default as CommentCard } from "./CommentCard";
+
+// Chat components
+export { default as ConversationItem } from "./ConversationItem";
+export { default as ConversationsList } from "./ConversationsList";
+export { default as MessageItem } from "./MessageItem";
+export { default as ChatMessages } from "./ChatMessages";
+export { default as MessageInput } from "./MessageInput";
+export { default as SearchBox } from "./SearchBox";

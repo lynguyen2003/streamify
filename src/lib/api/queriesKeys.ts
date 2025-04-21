@@ -12,4 +12,9 @@ export enum QUERY_KEYS {
     GET_COMMENTS = "getComments",
     GET_REPLIES_COMMENT = "getRepliesComment",
     SEARCH_POSTS = "searchPosts",
+    GET_INFINITE_CONVERSATIONS = "getInfiniteConversations",
+    GET_CONVERSATION = "getConversation",
+    GET_INFINITE_MESSAGES = "getInfiniteMessages",
+    SEARCH_CONVERSATIONS = "searchConversations",
+    SEARCH_USERS = "searchUsers",
 }

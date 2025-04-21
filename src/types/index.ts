@@ -89,3 +89,43 @@ export type ICommentInput = {
   parentCommentId?: string | null;
   postId: string;
 }
+
+export type IMessage = {
+  _id: string;
+  sender: IUser;
+  content: string;
+  contentType: string;
+  mediaUrl: string | null;
+  readBy: IUser[];
+  conversationId: string;
+  createdAt: string;
+  updatedAt: string;
+  deleted: boolean;
+};
+
+export type IConversation = {
+  _id: string;
+  participants: IUser[];
+  type: string;
+  name: string | null;
+  lastMessage: IMessage | null;
+  createdBy: IUser;
+  createdAt: string;
+  updatedAt: string;
+  isActive: boolean;
+  unreadCount: number;
+};
+
+export type ICreateConversation = {
+  participantIds: string[];
+  type?: string;
+  name?: string;
+  initialMessage?: string;
+};
+
+export type ISendMessage = {
+  conversationId: string;
+  content: string;
+  contentType?: string;
+  mediaUrl?: string;
+};

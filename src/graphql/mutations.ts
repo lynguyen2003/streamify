@@ -247,6 +247,73 @@ export const RESET_PASSWORD = gql`
   }
 `;
 
+// ========== CHAT ==========
+
+export const CREATE_CONVERSATION = gql`
+  mutation CreateConversation($input: CreateConversationInput!) {
+    createConversation(input: $input) {
+      _id
+      participants {
+        _id
+        username
+        imageUrl
+      }
+      type
+      name
+      lastMessage {
+        _id
+        content
+        contentType
+        createdAt
+      }
+      createdBy {
+        _id
+        username
+      }
+      createdAt
+    }
+  }
+`;
+
+export const SEND_MESSAGE = gql`
+  mutation SendMessage($input: SendMessageInput!) {
+    sendMessage(input: $input) {
+      _id
+      content
+      contentType
+      mediaUrl
+      sender {
+        _id
+        username
+        imageUrl
+      }
+      createdAt
+    }
+  }
+`;
+
+export const MARK_CONVERSATION_AS_READ = gql`
+  mutation MarkConversationAsRead($conversationId: String!) {
+    markConversationAsRead(conversationId: $conversationId)
+  }
+`;
+
+export const DELETE_MESSAGE = gql`
+  mutation DeleteMessage($messageId: String!) {
+    deleteMessage(messageId: $messageId)
+  }
+`;
+
+export const DELETE_CONVERSATION = gql`
+  mutation DeleteConversation($conversationId: String!) {
+    deleteConversation(conversationId: $conversationId)
+  }
+`;
+
+
+
+
+
 
 
 

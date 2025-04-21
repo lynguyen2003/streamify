@@ -4,11 +4,50 @@ import {
   useQueryClient
 } from '@tanstack/react-query';
 import { apolloClient } from '@/lib/api/apiSlice';
-import { GET_POSTS, GET_USER_BY_ID, GET_LIKED_POSTS, GET_USERS, GET_FRIENDSHIP_STATUS, IS_FOLLOWING, GET_POST_BY_ID, GET_COMMENTS, GET_REPLIES_COMMENT, SEARCH_POSTS } from '@/graphql/queries';
-import { ACCEPT_FRIEND_REQUEST, ADD_COMMENT, ADD_FRIEND, BLOCK_USER, CANCEL_FRIEND_REQUEST, CREATE_POST, DELETE_COMMENT, DELETE_POST, FOLLOW_USER, LIKE_COMMENT, REJECT_FRIEND_REQUEST, REPLY_COMMENT, TOGGLE_LIKE_POST, TOGGLE_SAVE_POST, UNFOLLOW_USER, UNFRIEND, UPDATE_USER } from '@/graphql/mutations';
+import { 
+  GET_POSTS, 
+  GET_USER_BY_ID, 
+  GET_LIKED_POSTS, 
+  GET_USERS, 
+  GET_FRIENDSHIP_STATUS, 
+  IS_FOLLOWING, 
+  GET_POST_BY_ID, 
+  GET_COMMENTS, 
+  GET_REPLIES_COMMENT, 
+  SEARCH_POSTS,
+  GET_CONVERSATIONS,
+  GET_CONVERSATION,
+  GET_MESSAGES,
+  SEARCH_CONVERSATIONS,
+  SEARCH_USERS
+} from '@/graphql/queries';
+import { 
+  ACCEPT_FRIEND_REQUEST, 
+  ADD_COMMENT, 
+  ADD_FRIEND, 
+  BLOCK_USER, 
+  CANCEL_FRIEND_REQUEST, 
+  CREATE_POST, 
+  DELETE_COMMENT, 
+  DELETE_POST, 
+  FOLLOW_USER, 
+  LIKE_COMMENT, 
+  REJECT_FRIEND_REQUEST, 
+  REPLY_COMMENT, 
+  TOGGLE_LIKE_POST, 
+  TOGGLE_SAVE_POST, 
+  UNFOLLOW_USER, 
+  UNFRIEND, 
+  UPDATE_USER,
+  CREATE_CONVERSATION,
+  SEND_MESSAGE,
+  MARK_CONVERSATION_AS_READ,
+  DELETE_MESSAGE,
+  DELETE_CONVERSATION,
+} from '@/graphql/mutations';
 import { useMutation } from '@apollo/client';
 import { toast } from 'sonner';
-import { IComment, ICommentInput, ICreatePost, IUpdateUser } from '@/types';
+import { ICommentInput, ICreatePost, IUpdateUser, ICreateConversation, ISendMessage } from '@/types';
 import { QUERY_KEYS } from './queriesKeys';
 // ========== POSTS ==========
 
@@ -102,6 +141,14 @@ async function getReplies({ postId, parentCommentId }: { postId: string, parentC
   return data.comments;
 }
 
+async function searchUsers({ query }: { query: string }) {
+  const { data } = await apolloClient.query({
+    query: SEARCH_USERS,
+    variables: { query }
+  });
+  return data.searchUsers;
+}
+
 // =====================================
 // ========== USE REACT QUERY ==========
 // =====================================
@@ -190,6 +237,14 @@ export const useGetReplies = (postId: string, parentCommentId: string) => {
     enabled: !!postId && !!parentCommentId
   });
 } 
+
+export const useSearchUsers = (query: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.SEARCH_USERS, query],
+    queryFn: () => searchUsers({ query }),
+    enabled: !!query && query.length > 2,
+  });
+}
 
 /** useMutation */
 
@@ -525,3 +580,222 @@ export const useDeleteCommentMutation = () => {
     error
   };
 } 
+
+// ========== CHATS ==========
+
+async function getInfiniteConversations({ pageParam = null }: { pageParam: string | null }) {
+  const { data } = await apolloClient.query({
+    query: GET_CONVERSATIONS,
+    variables: { cursor: pageParam, limit: 10 },
+    fetchPolicy: 'network-only'
+  });
+  return data.conversations;
+}
+
+async function getConversation({ id }: { id: string }) {
+  const { data } = await apolloClient.query({
+    query: GET_CONVERSATION,
+    variables: { id },
+    fetchPolicy: 'network-only'
+  });
+  return data.conversation;
+}
+
+async function getInfiniteMessages({ 
+  conversationId, 
+  pageParam = null 
+}: { 
+  conversationId: string, 
+  pageParam: string | null 
+}) {
+  const { data } = await apolloClient.query({
+    query: GET_MESSAGES,
+    variables: { 
+      conversationId, 
+      cursor: pageParam, 
+      limit: 20 
+    },
+    fetchPolicy: 'network-only'
+  });
+  return data.messages;
+}
+
+async function searchConversations({ query }: { query: string }) {
+  const { data } = await apolloClient.query({
+    query: SEARCH_CONVERSATIONS,
+    variables: { query },
+    fetchPolicy: 'network-only'
+  });
+  return data.searchConversations;
+}
+
+// ========== USE REACT QUERY HOOKS FOR CHAT ==========
+
+export const useInfiniteConversations = () => {
+  return useInfiniteQuery({
+    queryKey: [QUERY_KEYS.GET_INFINITE_CONVERSATIONS],
+    queryFn: getInfiniteConversations,
+    initialPageParam: null,
+    getNextPageParam: (lastPage: any) => 
+      lastPage.pageInfo.hasNextPage ? lastPage.pageInfo.endCursor : undefined,
+  });
+}
+
+export const useGetConversation = (id: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_CONVERSATION, id],
+    queryFn: () => getConversation({ id }),
+    enabled: !!id,
+  });
+}
+
+export const useInfiniteMessages = (conversationId: string) => {
+  return useInfiniteQuery({
+    queryKey: [QUERY_KEYS.GET_INFINITE_MESSAGES, conversationId],
+    queryFn: ({ pageParam }) => getInfiniteMessages({ 
+      conversationId, 
+      pageParam 
+    }),
+    initialPageParam: null,
+    getNextPageParam: (lastPage: any) => 
+      lastPage.pageInfo.hasNextPage ? lastPage.pageInfo.endCursor : undefined,
+    enabled: !!conversationId,
+  });
+}
+
+export const useSearchConversations = (query: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.SEARCH_CONVERSATIONS, query],
+    queryFn: () => searchConversations({ query }),
+    enabled: !!query && query.length > 0,
+  });
+}
+
+// ========== CHAT MUTATIONS ==========
+
+export const useCreateConversationMutation = () => {
+  const queryClient = useQueryClient();
+  const [createConversationMutation, { loading, error }] = useMutation(CREATE_CONVERSATION, {
+    onCompleted: (data) => {
+      toast.success('Conversation created successfully');
+      queryClient.invalidateQueries({ 
+        queryKey: [QUERY_KEYS.GET_INFINITE_CONVERSATIONS],
+        refetchType: 'active'
+      });
+    },
+    onError: (error) => {
+      toast.error(`Failed to create conversation: ${error.message}`);
+    }
+  });
+
+  return {
+    createConversation: (input: ICreateConversation) => createConversationMutation({ variables: { input } }),
+    loading,  
+    error
+  };
+}
+
+export const useSendMessageMutation = () => {
+  const queryClient = useQueryClient();
+  const [sendMessageMutation, { loading, error }] = useMutation(SEND_MESSAGE, {
+    onCompleted: (data) => {
+      // Invalidate conversation to update last message
+      queryClient.invalidateQueries({ 
+        queryKey: [QUERY_KEYS.GET_CONVERSATION, data.sendMessage.conversationId],
+        refetchType: 'active'
+      });
+      
+      // Also invalidate conversations list
+      queryClient.invalidateQueries({ 
+        queryKey: [QUERY_KEYS.GET_INFINITE_CONVERSATIONS],
+        refetchType: 'active'
+      });
+    },
+    onError: (error) => {
+      toast.error(`Failed to send message: ${error.message}`);
+    }
+  });
+
+  return {
+    sendMessage: (input: ISendMessage) => sendMessageMutation({ variables: { input } }),
+    loading,  
+    error
+  };
+}
+
+export const useMarkConversationAsReadMutation = () => {
+  const queryClient = useQueryClient();
+  const [markConversationAsReadMutation, { loading, error }] = useMutation(MARK_CONVERSATION_AS_READ, {
+    onCompleted: (data) => {
+      // Update conversation to reflect read status
+      queryClient.invalidateQueries({ 
+        queryKey: [QUERY_KEYS.GET_CONVERSATION, data.conversationId],
+        refetchType: 'active'
+      });
+      
+      // Also invalidate conversations list to update unread counts
+      queryClient.invalidateQueries({ 
+        queryKey: [QUERY_KEYS.GET_INFINITE_CONVERSATIONS],
+        refetchType: 'active'
+      });
+    }
+  });
+
+  return {
+    markConversationAsRead: (conversationId: string) => markConversationAsReadMutation({ 
+      variables: { conversationId } 
+    }),
+    loading,  
+    error
+  };
+}
+
+export const useDeleteMessageMutation = () => {
+  const queryClient = useQueryClient();
+  const [deleteMessageMutation, { loading, error }] = useMutation(DELETE_MESSAGE, {
+    onCompleted: (data) => {
+      toast.success('Message deleted');
+      
+      // Invalidate messages for the conversation
+      queryClient.invalidateQueries({ 
+        queryKey: [QUERY_KEYS.GET_INFINITE_MESSAGES],
+        refetchType: 'active'
+      });
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete message: ${error.message}`);
+    }
+  });
+
+  return {
+    deleteMessage: (messageId: string) => deleteMessageMutation({ variables: { messageId } }),
+    loading,  
+    error
+  };
+}
+
+export const useDeleteConversationMutation = () => {
+  const queryClient = useQueryClient();
+  const [deleteConversationMutation, { loading, error }] = useMutation(DELETE_CONVERSATION, {
+    onCompleted: () => {
+      toast.success('Conversation deleted');
+      
+      // Invalidate conversations list
+      queryClient.invalidateQueries({ 
+        queryKey: [QUERY_KEYS.GET_INFINITE_CONVERSATIONS],
+        refetchType: 'active'
+      });
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete conversation: ${error.message}`);
+    }
+  });
+
+  return {
+    deleteConversation: (conversationId: string) => deleteConversationMutation({ 
+      variables: { conversationId } 
+    }),
+    loading,  
+    error
+  };
+}   

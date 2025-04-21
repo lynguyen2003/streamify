@@ -11,6 +11,7 @@ import LikedPosts from "@/components/shared/LikedPosts";
 import UpdateProfile from "@/components/forms/UpdateProfile";
 import PostDetails from "@/components/shared/PostDetails";
 import Explore from "@/pages/Explore";
+import Chat from "@/pages/Chat";
 
 interface RouteType {
     path: string;
@@ -34,6 +35,8 @@ export const privateRoutes: PrivateRouteType[] = [
     { path: '/liked-posts/:id', component: LikedPosts, layout: DefaultLayout },
     { path: '/posts/:id', component: PostDetails, layout: DefaultLayout },
     { path: '/explore', component: Explore, layout: DefaultLayout },
+    { path: '/chat', component: Chat, layout: DefaultLayout },
+    { path: '/chat/:conversationId', component: Chat, layout: DefaultLayout },
 ]
 
 

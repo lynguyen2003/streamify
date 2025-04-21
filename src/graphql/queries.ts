@@ -284,3 +284,140 @@ export const SEARCH_POSTS = gql`
     }
   }
 `;
+
+export const GET_CONVERSATIONS = gql`
+  query Conversations($cursor: String, $limit: Int) {
+    conversations(cursor: $cursor, limit: $limit) {
+      edges {
+        node {
+          _id
+          participants {
+            _id
+            username
+            imageUrl
+          }
+          type
+          name
+          lastMessage {
+            _id
+            content
+            contentType
+            createdAt
+            sender {
+              _id
+              username
+              imageUrl
+            }
+          }
+          createdAt
+          unreadCount
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+`;
+
+export const GET_CONVERSATION = gql`
+  query Conversation($id: String!) {
+    conversation(id: $id) {
+      _id
+      participants {
+        _id
+        username
+        imageUrl
+      }
+      type
+      name
+      lastMessage {
+        _id
+        content
+        contentType
+        createdAt
+        sender {
+          _id
+          username
+          imageUrl
+        }
+      }
+      createdBy {
+        _id
+        username
+      }
+      createdAt
+      unreadCount
+    }
+  }
+`;
+
+export const GET_MESSAGES = gql`
+  query Messages($conversationId: String!, $cursor: String, $limit: Int) {
+    messages(conversationId: $conversationId, cursor: $cursor, limit: $limit) {
+      edges {
+        node {
+          _id
+          content
+          contentType
+          mediaUrl
+          sender {
+            _id
+            username
+            imageUrl
+          }
+          readBy {
+            _id
+            username
+          }
+          createdAt
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+`;
+
+export const SEARCH_CONVERSATIONS = gql`
+  query SearchConversations($query: String!) {
+    searchConversations(query: $query) {
+      _id
+      participants {
+        _id
+        username
+        imageUrl
+      }
+      type
+      name
+      lastMessage {
+        _id
+        content
+        contentType
+        createdAt
+        sender {
+          _id
+          username
+          imageUrl
+        }
+      }
+      createdAt
+      unreadCount
+    }
+  }
+`;
+
+export const SEARCH_USERS = gql`
+  query SearchUsers($query: String!) {
+    searchUsers(query: $query) {
+      _id
+      username
+      imageUrl
+      bio
+    }
+  }
+`;
+
